@@ -1,4 +1,8 @@
 <!DOCTYPE html>
+
+<!-- 🌟 本项目已托管至 GitHub 仓库：https://github.com/dengguanbigeng/shenrujingzang.git -->
+<!-- 💡 提示：每次在此电脑修改代码/经文后，请将此文件夹内的【零散文件】全选上传至上述仓库，Netlify 网站将自动全球无缝热更新 -->
+
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
@@ -8,7 +12,7 @@
     <link rel="icon" type="image/png" href="favicon.png">
 
     <script>
-        window.DGBJ_VERSION = "2026.08"; 
+        window.DGBJ_VERSION = "2026.09"; 
     </script>
 
     <script>
@@ -1244,7 +1248,9 @@
         }
     }
 
-    function showErrorBubble(x, y, currentIndex, totalErrors) {
+    
+
+function showErrorBubble(x, y, currentIndex, totalErrors) {
         const oldBubble = document.getElementById("error-bubble");
         if (oldBubble) oldBubble.remove();
 
@@ -1253,9 +1259,23 @@
             totalErrors = reScan.total;
         }
 
+        // 🌟 核心逻辑：提取当前错字与底稿中对应的正确字
+        const baseChars = toChars(sourceIn.value || baseLy.innerText || "");
+        const typedChars = toChars(inputLy.innerText || "");
+        const wrongChar = typedChars[currentIndex] || "?";  // 金色错字
+        const rightChar = baseChars[currentIndex] || "?";  // 底稿正确字
+
         const extraCount = totalErrors - 1;
         let extraNotice = "";
         let buttonHtml = "";
+
+        // 🌟 提取出通用的“一键自动修正”按钮 HTML 与样式
+        const autoFixBtnHtml = `
+            <button onclick="event.stopPropagation(); if (confirm('检测到录入与底本有差异，是否由系统一键自动修正错字笔误？')) { autoFixText(); }" 
+                    style="background: #2e8b57; color: white; border: none; padding: 4px 10px; font-size: 11px; border-radius: 6px; cursor: pointer; font-weight: bold; box-shadow: 0 1px 4px rgba(0,0,0,0.15); font-family: sans-serif; transition: 0.2s;">
+                ✨ 一键修正
+            </button>
+        `;
 
         const closeBtnHtml = `
             <button onclick="event.stopPropagation(); const ob = document.getElementById('error-bubble'); if(ob)ob.remove(); removeHighlights(); goGoldEnd();" 
@@ -1264,32 +1284,40 @@
             </button>
         `;
 
+        // 🌟 根据错字数量，动态拼装按钮布局（皆在右侧并排，【一键修正】在【下一处】或【知道了】前面）
         if (totalErrors > 1) {
             extraNotice = `<div style="font-size:12px; font-weight:normal; color:#e74c3c; margin-top:5px; text-align:center;">
                 💡 除此处外，还有 <b style="color:#e74c3c;">${extraCount}</b> 处错字。
             </div>`;
             buttonHtml = `
-                <div style="margin-top: 8px; display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+                <div style="margin-top: 8px; display: flex; justify-content: space-between; align-items: center; gap: 6px;">
                     ${closeBtnHtml}
-                    <button onclick="event.stopPropagation(); navigateToNextError(${currentIndex});" 
-                            style="background: var(--primary); color: white; border: none; padding: 4px 10px; font-size: 11px; border-radius: 6px; cursor: pointer; font-weight: bold; box-shadow: 0 1px 4px rgba(0,0,0,0.15); font-family: sans-serif;">
-                        下一处 ❯
-                    </button>
+                    <div style="display: flex; gap: 6px;">
+                        ${autoFixBtnHtml}
+                        <button onclick="event.stopPropagation(); navigateToNextError(${currentIndex});" 
+                                style="background: var(--primary); color: white; border: none; padding: 4px 10px; font-size: 11px; border-radius: 6px; cursor: pointer; font-weight: bold; box-shadow: 0 1px 4px rgba(0,0,0,0.15); font-family: sans-serif;">
+                            下一处 ❯
+                        </button>
+                    </div>
                 </div>`;
         } else {
             extraNotice = "";
             buttonHtml = `
-                <div style="margin-top: 8px; text-align: right;">
+                <div style="margin-top: 8px; display: flex; justify-content: space-between; align-items: center; gap: 6px;">
                     ${closeBtnHtml}
+                    ${autoFixBtnHtml}
                 </div>`;
         }
 
         const bubble = document.createElement("div");
         bubble.id = "error-bubble";
+        
         bubble.innerHTML = `
-            <div style="font-size:14px; margin-bottom:3px; color:#b8860b; font-family:'STKaiti', 'KaiTi', serif; text-align:center;">📜 提示：此处与底稿字形不同</div>
+            <div style="font-size:14px; margin-bottom:5px; color:#b8860b; font-family:'STKaiti', 'KaiTi', serif; text-align:center; font-weight:bold;">
+                📜 字形提示：${wrongChar} → <span style="color:#e74c3c; font-size:16px;">${rightChar}</span>
+            </div>
             <div style="font-size:12px; font-weight:normal; color:#666; line-height:1.4; max-width:250px; text-align:left; font-family:sans-serif;">
-                请修改错字，可点击右下角的<b>【开启校验】</b>一键修正。
+                请将当前的“<b>${wrongChar}</b>”修改为底稿中的“<b>${rightChar}</b>”。
             </div>
             ${extraNotice}
             ${buttonHtml}
@@ -1306,7 +1334,8 @@
         bubble.style.pointerEvents = "auto"; 
 
         bubble.style.left = x + "px";
-        const yOffset = totalErrors > 1 ? 128 : 108; 
+        // 适当增加了气泡高度的偏移量（yOffset），防止底部按钮变多后向下遮挡经文
+        const yOffset = totalErrors > 1 ? 142 : 122; 
         bubble.style.top = (y + window.pageYOffset - yOffset) + "px"; 
         bubble.style.transform = "translateX(-50%)";
 
@@ -1324,12 +1353,15 @@
 
         document.body.appendChild(bubble);
 
-        const hideDuration = totalErrors > 1 ? 15000 : 9000;
+        const hideDuration = totalErrors > 1 ? 20000 : 12000;
         clearTimeout(bubbleTimeout);
         bubbleTimeout = setTimeout(() => {
             if (bubble.parentNode) bubble.remove();
         }, hideDuration);
     }
+
+
+
 
     function navigateToNextError(currentIdx) {
         const baseChars = toChars(sourceIn.value || baseLy.innerText || "");
