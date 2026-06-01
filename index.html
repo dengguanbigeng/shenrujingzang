@@ -1,0 +1,1917 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#2a6372">
+    <title>经藏等观｜笔耕系统</title>   
+    <link rel="icon" type="image/png" href="favicon.png">
+
+    <script>
+        window.DGBJ_VERSION = "2026.08"; 
+    </script>
+
+    <script>
+    (function() {
+        const CURRENT_VERSION = window.DGBJ_VERSION;
+        const lastVersion = localStorage.getItem("DGBJ_APP_VERSION");
+        
+        if (lastVersion !== CURRENT_VERSION) {
+            localStorage.setItem("DGBJ_APP_VERSION", CURRENT_VERSION);
+            if (navigator.serviceWorker) {
+                navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                    for (let r of registrations) { r.unregister(); }
+                });
+            }
+            console.log("🚀 检测到笔耕新版 v" + CURRENT_VERSION + "，正在自动洗净缓存...");
+            window.location.reload(true);
+        }
+    })();
+    </script>
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QGSWBD4P37"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-QGSWBD4P37');
+    </script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-screen-webfont@1.1.0/style.css" />
+    <script src="https://unpkg.com/pinyin-pro" onerror="this.onerror=null; document.write('<script src=\'pinyin-pro.js\'><\/script>')"></script>
+    <script src="special-pinyinmb.js"></script>
+    
+    <style>
+    :root {
+        --char-size: 36px;
+        --line-chars: 29;
+        --paper-width: calc(var(--char-size) * var(--line-chars));
+        --gold: #ffea00;
+        --silver: rgba(255, 255, 255, 0.45);
+        --bg-color: #2a6372;
+        --primary: #2d6f7b;
+        --accent: #d38934;
+    }
+
+    body, html {
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+        overflow: hidden;
+        background: #222;
+        font-family: "STKaiti", "KaiTi", serif;    
+        -webkit-text-size-adjust: 100%;
+    }
+
+    .app-container {
+        display: grid;
+        grid-template-columns: 250px 1fr;
+        height: 100vh;
+        width: 100vw;
+    }
+
+    .mobile-header {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 50px;
+        background: var(--primary);
+        color: white;
+        z-index: 2000;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 15px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+    .mobile-header h1 {
+        font-size: 16px;
+        margin: 0;
+    }
+    .mobile-header button {
+        background: transparent;
+        border: 1px solid rgba(255,255,255,0.4);
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-size: 12px;
+    }
+
+    #controls {
+        position: relative;
+        background: #fdfdfd;
+        padding: 25px;
+        border-right: 1px solid #ddd;
+        z-index: 100;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        height: 100vh;
+        overflow-y: auto;
+        box-sizing: border-box;
+        transition: transform 0.3s ease, -webkit-transform 0.3s ease;
+    }
+
+    #stage {
+        background: var(--bg-color);
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        justify-content: flex-start;
+        position: relative;
+        overflow-y: auto !important;
+        overflow-x: hidden; 
+        scroll-behavior: auto !important; 
+        min-height: 100vh;
+        z-index: 1;
+        overscroll-behavior-y: contain;
+        box-sizing: border-box;
+    }
+
+    .text-layer {
+        font-size: var(--char-size) !important;
+        line-height: 1.7 !important;
+        font-weight: bold;
+        white-space: pre-wrap;
+        text-align: left;
+        width: var(--paper-width);
+        font-family: "Noto Serif SC", "STKaiti", "KaiTi", "楷体",  serif;
+        letter-spacing: 0.05em;
+        word-break: break-all;
+        overflow-wrap: anywhere;
+        margin: 0 !important;
+        padding: 0 !important;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    #input-layer {
+        color: var(--gold);
+        -webkit-text-stroke: 0.0px var(--gold);
+        text-shadow: 0 0 1px rgba(0,0,0,0.2), 0 0 8px rgba(255,234,0,0.35);
+        position: relative;
+        z-index: 2;
+        outline: none;
+        caret-color: #ffea00;
+        display: inline;                                    
+        white-space: pre-wrap;
+        pointer-events: auto;
+        min-height: 1.8em;
+    }
+
+    #base-layer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 1;
+        color: var(--silver);
+        width: var(--paper-width) !important;
+        font-family: "Noto Serif SC", "STKaiti", "KaiTi", "楷体",  serif;
+        word-break: break-all !important;
+        white-space: pre-wrap !important;
+        user-select: text !important;
+        pointer-events: auto !important;
+    }
+
+    .sync-overlay {
+        position: relative;
+        width: 100%;
+        left: 0;
+        background: #fdfdfd;
+        z-index: 1000;
+        display: none;
+        flex-direction: column;
+        padding: 12px;
+        box-sizing: border-box;
+        border: 2px solid var(--primary);
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        margin-top: 0px; 
+    }
+
+    .sync-overlay textarea {
+        flex-grow: 0;
+        font-size: 12px;
+        margin-bottom: 6px;
+        border: 1px solid #ddd;
+        padding: 8px;
+    }
+
+    .source-wrapper {
+        position: relative;
+        margin-bottom: 5px; 
+        height: auto;
+    }
+
+    #sutra-display-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: var(--paper-width);
+        flex-shrink: 0;
+        margin-left: 10px;
+        padding-bottom: 100px;
+    }
+
+    #sutra-display-title {
+        color: var(--gold);
+        font-family: "Noto Serif SC", "STKaiti", "KaiTi", "楷体",  serif;
+        font-size: 45px;
+        margin: 50px 0;
+        letter-spacing: 0.12em;
+        font-weight: bold;
+        text-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        text-align: center;
+    }
+
+    #paper {
+        width: var(--paper-width);
+        position: relative;
+    }
+
+    #controls h2 {
+        font-size: 12px;
+        font-weight: 300;
+        color: #4a4a4a;
+        letter-spacing: 2px;
+        margin-top: 10px;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
+        font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+        text-align: center;
+        width: 100%;
+    }
+
+    .section-title {
+        font-size: 16px;
+        font-weight: bold;
+        margin: 12px 0 6px;
+        color: var(--primary);
+        border-left: 4px solid var(--primary);
+        padding-left: 10px;
+        cursor: pointer;
+    }
+
+    input[type="text"], textarea, select {
+        width: 100%;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        box-sizing: border-box;
+        padding: 10px;
+    }
+
+    button {
+        border: none;
+        border-radius: 10px;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+        padding: 8px 10px;
+        font-size: 13px;
+        line-height: 1.2;
+        transition: 0.2s;
+    }
+
+    button:hover { opacity: 0.9; transform: translateY(-1px); }
+
+    #chapter-bookmark-container {
+        position: sticky;
+        top: 20px;
+        margin-left: 15px;
+        margin-right: 30px;
+        display: flex;
+        align-items: flex-start;
+        z-index: 1000;
+    }
+
+    #bookmark-display {
+        writing-mode: vertical-rl;
+        width: 50px;
+        height: 75vh;
+        background: var(--bg-color);
+        border: 2px solid var(--gold);
+        border-radius: 15px;
+        color: var(--gold);
+        font-size: 26px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        padding: 20px 5px;
+    }
+
+    #chapter-menu {
+        position: absolute;
+        left: 65px;
+        top: 0;
+        background: transparent !important; 
+        border: none !important; 
+        display: none; 
+        visibility: hidden !important;
+        opacity: 0 !important;
+        width: 0 !important;
+        height: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        overflow: hidden !important;
+        pointer-events: none !important;
+        z-index: -1;
+    }
+
+    #admin-box { gap: 1px !important; }
+    #admin-box button { padding: 4px 10px !important; font-size: 10px !important; margin-bottom: 2px !important; }
+
+    #pinyin-float-panel {
+        position: fixed;
+        right: 25px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 220px;
+        height: 750px;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(8px);
+        border: 2px solid var(--gold);
+        border-radius: 20px;
+        padding: 15px;
+        text-align: center;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        transition: transform 0.3s ease;
+    }
+
+    .mode-badge {
+        width: fit-content;
+        margin: -2px auto 14px auto;
+        padding: 6px 16px;
+        border-radius: 999px;
+        background: rgba(45, 111, 123, 0.08);
+        border: 1px solid rgba(45, 111, 123, 0.22);
+        color: var(--primary);
+        font-size: 13px;
+        font-weight: bold;
+        letter-spacing: 1px;
+    }
+
+    .side-main-btn {
+        width: 100%;
+        padding: 6px 6px;
+        border-radius: 18px;
+        font-size: 13px;
+        font-weight: bold;
+        margin-bottom: 6px;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+        border: none;
+        color: white;
+        cursor: pointer;
+    }
+    .check-btn { background: var(--primary); }
+    .orange-btn { background: var(--accent); }
+    .green-btn { background: #2e8b57; }
+
+    .admin-only { display: none !important; }
+
+    .help-modal-mask {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.45);
+        z-index: 10000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+    }
+    .help-modal-box {
+        width: 520px;
+        max-width: 90vw;
+        background: #fff;
+        border: 2px solid var(--gold);
+        border-radius: 18px;
+        padding: 24px;
+        color: #333;
+        line-height: 1.5;
+    }
+
+    .help-modal-box p { margin:7px 0; }
+    .system-title-box { display: flex; flex-direction: column; align-items: center; margin-bottom: 18px; }
+    .wenshu-sign { height: 34px; width: 180px; margin-top: -6px; margin-bottom: 8px; opacity: 0.88; }
+
+    @media screen and (max-width: 1024px) {
+        .app-container {
+            grid-template-columns: 1fr;
+            padding-top: 50px;
+        }
+        .mobile-header { display: flex; }
+         #controls {
+            position: fixed;
+            left: 0;
+            top: 50px;
+            width: 290px;
+            height: calc(100dvh - 50px); 
+            display: block !important;
+            transform: translate3d(-100%, 0, 0);
+            -webkit-transform: translate3d(-100%, 0, 0);
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+            z-index: 1500;
+            background: #ffffff;
+            padding: 20px 20px calc(100px + env(safe-area-inset-bottom, 0px)) 20px !important; 
+            box-sizing: border-box;
+            -webkit-overflow-scrolling: touch;
+        }
+        #controls.active { 
+            transform: translate3d(0, 0, 0); 
+            -webkit-transform: translate3d(0, 0, 0); 
+        }
+        #admin-wrapper {
+            margin-top: 35px !important;
+            margin-bottom: 25px !important;
+        }
+        #controls::-webkit-scrollbar {
+            width: 6px !important;
+            display: block !important;
+        }
+        #controls::-webkit-scrollbar-thumb {
+            background-color: rgba(0, 0, 0, 0.25) !important; 
+            border-radius: 10px !important;
+        }
+        #controls::-webkit-scrollbar-track {
+            background: transparent !important;
+        }
+        #pinyin-float-panel {
+            position: fixed;
+            right: 0;
+            top: 50px;
+            transform: translate3d(100%, 0, 0);
+            -webkit-transform: translate3d(100%, 0, 0);
+            width: 280px;
+            height: calc(100vh - 50px);
+            border-radius: 0;
+            border: none;
+            border-left: 2px solid var(--gold);
+            z-index: 1500;
+        }
+        #pinyin-float-panel.active { 
+            transform: translate3d(0, 0, 0); 
+            -webkit-transform: translate3d(0, 0, 0); 
+        }
+        .drawer-mask {
+            display: none;
+            position: fixed;
+            inset: 50px 0 0 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 1400;
+        }
+        .drawer-mask.active { display: block; }
+        :root {
+            --char-size: clamp(28px, 8vw, 38px);
+            --line-chars: 11;
+            --paper-width: 95vw;
+        }
+        @media screen and (max-width: 375px) and (max-height: 700px) {
+            :root {
+                --char-size: clamp(26px, 7.5vw, 32px);
+                --line-chars: 10;
+                --paper-width: 96vw;
+            }
+            .text-layer { letter-spacing: 0.03em !important; }
+        }
+        @media screen and (max-width: 340px) {
+            :root {
+                --char-size: 24px;
+                --line-chars: 9;
+                --paper-width: 98vw;
+            }
+            .text-layer { letter-spacing: 0.01em !important; }
+        }
+        #stage {
+            justify-content: center;
+            padding: 15px 8px;
+            width: 100vw;
+            height: calc(100vh - 50px);
+        }
+        #sutra-display-container {
+            width: var(--paper-width);
+            margin-left: 0;
+            overflow-x: hidden;
+        }
+        #sutra-display-title { font-size: 24px; margin: 15px 0; }
+        .text-layer {
+            width: var(--paper-width) !important;
+            line-height: 1.7 !important;
+            word-break: break-word !important;
+            overflow-wrap: break-word !important;
+        }
+        #paper { position: relative; width: var(--paper-width); }
+        #base-layer, #input-layer { position: relative; width: 100% !important; min-height: 100px; }
+        #input-layer { position: absolute; top: 0; left: 0; background: transparent; }
+        #chapter-bookmark-container { display: none !important; }
+        .sync-overlay { width: 100%; left: 0; }
+        .help-modal-mask {
+            align-items: flex-start !important;
+            padding-top: 60px !important;
+            padding-bottom: 40px !important;
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch;
+        }
+        .help-modal-box { height: auto !important; max-height: none !important; margin: 0 auto !important; }
+    }
+
+    #error-bubble { animation: bubbleFadeIn 0.25s ease-out forwards; }
+    @keyframes bubbleFadeIn {
+        from { opacity: 0; transform: translate(-50%, 8px); }
+        to { opacity: 1; transform: translate(-50%, 0); }
+    }
+
+    @keyframes errorFlash {
+        0% { background: rgba(255, 0, 0, 0.15); box-shadow: 0 0 2px rgba(255, 0, 0, 0.2); }
+        50% { background: rgba(255, 0, 0, 0.5); box-shadow: 0 0 8px rgba(255, 0, 0, 0.4); }
+        100% { background: rgba(255, 0, 0, 0.15); box-shadow: 0 0 2px rgba(255, 0, 0, 0.2); }
+    }
+
+    .error-highlight {
+        border-radius: 4px;
+        animation: errorFlash 0.6s infinite;
+        display: inline-block;
+    }
+    </style>
+</head>
+
+<body onclick="closeMenu()">
+
+    <div class="mobile-header">
+        <button onclick="toggleDrawer('controls')">🛠️ 系统工具</button>
+        <h1>等观笔耕 经藏版</h1>
+        <button onclick="toggleDrawer('pinyin-float-panel')">📚 阅藏摄取</button>
+    </div>
+
+    <div class="drawer-mask" id="drawer-mask" onclick="closeAllDrawers()"></div>
+
+    <div class="app-container">
+        
+        <div id="controls">
+            <div class="system-title-box">
+                <h2 id="dynamic-title">等观笔耕v 经藏版</h2>
+                <img src="./images/wenshu-sign.png" class="wenshu-sign" alt="伦敦文殊精舍">
+            </div>
+
+            <div class="section-title">经文标题</div>
+            <input type="text" id="title-input" placeholder="请输入经名..." oninput="handleTitleInput()" autocomplete="off" style="margin-bottom: 6px;">
+
+            <div class="source-wrapper">
+                <textarea id="source-input" oninput="syncText()" style="position: absolute; left: -9999px; top: -9999px; width: 1px; height: 1px; opacity: 0; pointer-events: none;" placeholder="在此粘贴经文原文作为底稿..." autocomplete="off"></textarea>
+
+                <div id="sync-panel" class="sync-overlay">
+                    <div style="font-size: 13px; color: var(--accent); margin-bottom: 5px; font-weight: bold;">📜 抄经进度同步（金色字）</div>
+                    <textarea id="sync-input" style="height:100px;" placeholder="在此粘贴需要补录经典的片段..." autocomplete="off"></textarea>
+                    <button style="background: var(--primary); padding: 8px; font-size: 13px; margin-top: 4px; width: 100%;" onclick="applySync(); closeAllDrawers();">✅ 确认补录并同步进度</button>
+                    <button onclick="showHelp()" style="background:#2d6f7b; padding: 8px; font-size:13px; margin-top:6px; width: 100%;">📘 使用帮助</button>
+                </div>
+            </div>
+
+            <div style="font-size:11px; color:#999; margin-bottom:12px; margin-top: 2px;">系统经藏当前以大正藏文本为准</div>
+
+            <div id="admin-wrapper" style="margin-top: 2px;">
+                 <div id="total-count-box" style="background:#2a6372; color:#FFF9C4; font-size:13px; margin:5px 0; display:flex; align-items:center; justify-content:center; border-radius:20px; padding:0px; border:1px solid var(--gold); position:relative; z-index:50; min-height:32px; flex-shrink:0;">
+                    <span>本经已精进：<b id="total-run" style="font-size: 17px; margin: 0 4px;">0</b> 遍</span>
+                    <button class="admin-only" onclick="resetRunCount()" style="position: absolute; right: 8px; background: rgba(231, 76, 60, 0.8); color: white; border: none; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; display: flex; align-items: center; justify-content: center;">×</button>
+                </div>
+
+                <div class="section-title" onclick="togglePanel('admin-box')">🛠️ 系统工具 ▼</div>
+                <div id="admin-box" style="display:none; flex-direction:column; gap:5px; background: white; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
+                    <button style="background:#2e8b57;" onclick="exportTxt()">💾 导出当前录入成果 (TXT)</button>
+                    <button style="background:#8e44ad;" onclick="exportBackup()">📦 导出完整备份</button>
+                    <button style="background:#16a085;" onclick="importBackup()"><input type="file" id="backupFile" style="display:none" onchange="handleImport(event)">📥 导入完整备份</button>
+                    <button style="background:#3498db;" onclick="resetInterface(); closeAllDrawers();">🧹 清净界面 · 准备新录</button>
+                    <button style="background:#7f8c8d; border: 1px solid #ff4d4d;" onclick="clearBase(); closeAllDrawers();">⚪ 物理化除底稿 (慎点)</button>
+                    <button style="background:#d38934;" onclick="clearGold(); closeAllDrawers();">✨ 抹去进度 · 再抄一遍</button>
+                </div>
+            </div>
+
+            <div id="stats-footer" style="margin-top: auto; padding: 10px; background: rgba(240,240,240,0.96); border-radius: 12px; border: 1px dotted #ccc; color: #666; font-size: 13px;">
+                <div style="display:flex; justify-content:space-between;">
+                    <div>底稿：<b id="base-count" style="color:#2d6f7b;">0</b></div>
+                    <div>抄经：<b id="char-count" style="color:#d38934;">0</b></div>
+                </div>
+            </div>
+        </div> 
+
+        <div id="stage">
+            <div id="chapter-bookmark-container">
+                <div id="bookmark-display" onclick="toggleMenu(event)">(品名)</div>
+                <select id="chapter-menu"></select>       
+            </div>
+
+            <div id="sutra-display-container">
+                <div id="sutra-display-title">深入经藏 智慧如海</div>
+                <div id="paper">
+                    <div id="base-layer" class="text-layer"></div>
+                    <div id="input-layer" class="text-layer" contenteditable="true" spellcheck="false"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="pinyin-float-panel">
+            <div style="font-size: 16px; color: var(--primary); font-weight: bold; margin-bottom: 12px;">📜 阅藏与摄取</div>
+            <div id="current-mode" class="mode-badge">当前模式：📚 系统经藏</div>
+
+            <div style="width: 100%; margin-bottom: 12px;">
+                <select id="sutra-select" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--gold); font-size: 12px;"></select>
+            </div>
+
+            <div style="display: flex; flex-direction: column; width: 100%; flex-grow: 1;">
+                <div style="width: 100%; margin-bottom: 8px;">
+                    <select id="sutra-selector" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--gold); font-size: 12px;">
+                        <option value="">--- 从经藏中调出进度 ---</option>
+                    </select>
+                </div>
+
+                <div style="width: 100%; flex-grow: 1; min-height: 150px; margin-bottom: 8px;">
+                    <textarea id="sutra-preview" placeholder="在此粘贴自选经典..." autocomplete="off" style="width: 100%; height: 100%; font-size: 15px; background: #fdfdfd; border: 1px solid #eee; border-radius: 6px; padding: 8px; resize: none; font-family: 'STKaiti', 'KaiTi', serif; line-height: 1.6; box-sizing: border-box;"></textarea>
+                </div>
+                
+                <div style="width: 100%; margin-bottom: 12px;">
+                    <button onclick="clearPreview()" style="width: 100%; background: #fdfdfd; color: #c0c0c0; border: 1px solid #ddd; border-radius: 20px; padding: 6px 0; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-family: 'STKaiti', 'KaiTi', serif; box-sizing: border-box;">
+                        <div style="width: 12px; height: 12px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #ffffff 0%, #e8e2f7 40%, #c8b8e8 100%); box-shadow: 0 0 5px rgba(200, 184, 232, 0.6);"></div>
+                        <span>空即是色 · 清空</span>
+                    </button>
+                </div>
+
+                <button onclick="importFromPreview(this); closeAllDrawers();" class="side-main-btn orange-btn" style="background: #b8860b; margin-bottom: 8px;">📥 摄取上方内容为底稿</button>
+                <button onclick="manualSave(); closeAllDrawers();" class="side-main-btn green-btn" style="margin-bottom: 8px;">💾 手动保存当前进度</button>
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid #eee; margin: 5px 0;">
+
+            <div style="flex-shrink: 0;">
+                <div style="font-size: 14px; color: var(--primary); margin-bottom: 8px; font-weight: bold;">• 般若音感 •</div>
+                <button onclick="togglePinyinMode(event)" class="side-main-btn" style="background:linear-gradient(135deg, #c084fc, #9333ea);">🔤 拼音/注音</button>
+                <button id="check-btn" onclick="toggleCheckMode(); closeAllDrawers();" class="side-main-btn check-btn" style="margin-bottom: 5px;">🔍 开启校验</button>
+                <div id="error-warning" style="display: none; color: #ff4d4d; font-size: 12px; margin-top: 2px;">⚠️ 录入有误</div>
+                <div id="py-display" style="font-size: 28px; color: var(--accent); font-weight: bold; min-height: 34px; margin: 5px 0;">-</div>
+                <div id="py-char" style="font-size: 24px; color: #666;">拼音参考</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="help-modal" class="help-modal-mask" onclick="hideHelp()">
+        <div class="help-modal-box" onclick="event.stopPropagation()">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h3 style="margin:0;">📘 等观笔耕 · 使用步骤</h3>
+                <button id="help-trad-toggle" style="background:#2d6f7b; padding:5px 12px; border-radius:15px; font-size:12px;">简体</button>
+            </div>
+            <div id="help-content">
+                <p>一、抄经 platform 分成系统抄经与自选抄经两个系统。从右侧“系统经藏”下的下拉菜单中选择经典可直接进入屏幕抄经。</p>
+                <p>二、如果要自选抄经，应先将所要抄写经文粘贴 to 右侧框中，然后点击“摄取上方内容为底稿”，屏幕中会生成银色底稿，即可进行自选抄经。</p>
+                <p>三、在中间金色文字层开始抄写，系统自动保存。</p>
+                <p>四、可点击“开启校验”检查正误。输入错别字代替某疑难字然后按此按钮即可。</p>
+                <p>五、抄完一遍后，点击“抹去进度 · 再抄一遍”可累计遍数。</p>
+                <p>六、按“导出完整备份”保存进度，按“导入完整备份”完全恢复。</p>
+                <p>七、在 iPhone 上打开网址，点击“分享（共享）”按钮，再点击 “添加到主屏幕”，点击右上角的 “添加” (Add)，屏幕上会出现类似App 图标。</p>
+                <p>八、在安卓手机上打开网址，点击“三个点”或“菜单/更多” 按钮，在菜单列表里找到并点击 “添加到桌面”、“添加到主屏幕” 或 “创建桌面快捷方式”，点击确定，屏幕上会出现类似App 图标。</p>
+                <p>九、关于使用的更多技巧，可以随时问AI帮助解决。</p>
+                <p>十、选中屏幕中的文字，在右下角会呈现拼音字符。拼音示例：标准音/咒语发音参考，誐：e/ga ye。</p>
+                <p>十一、抄经 platform 上的按钮及文字栏目，可以随意点击，不要担心出错，这样的灵活设置就是为了让初次使用者能够迅速熟识抄经系统的步骤。</p>
+            </div>
+            <button onclick="hideHelp()" style="background:#2d6f7b; width:100%; margin-top:12px;">我知道了</button>
+        </div>
+    </div>
+
+    <script>
+    const titleIn = document.getElementById('title-input');
+    const titleDisp = document.getElementById('sutra-display-title');
+    const sourceIn = document.getElementById('source-input');
+    const baseLy = document.getElementById('base-layer');
+    const inputLy = document.getElementById('input-layer');
+    const bookmarkDisplay = document.getElementById('bookmark-display');
+    const chapterMenu = document.getElementById('chapter-menu');
+
+    let isCheckMode = false;
+    let db = null;
+    let saveTimer = null;
+    let typoCheckTimer = null;
+
+    const DB_NAME = "DGBJ_JingZang_v14_dual_room";
+    const DB_VERSION = 6;
+
+    const STORE_CUSTOM = "sutras_custom";     
+    const STORE_BUILTIN = "sutras_builtin";   
+    const STORE_META = "meta";
+
+    let currentRoom = "custom";      
+    let currentSutraKey = "";        
+    let pinyinMode = "han"; 
+
+    let isCurrentRunCounted = false;
+
+    // 🌟 移动端侧边抽屉开关工具扩展
+    function toggleDrawer(id) {
+        const el = document.getElementById(id);
+        const mask = document.getElementById('drawer-mask');
+        if(!el) return;
+        el.classList.toggle('active');
+        if(mask) {
+            const anyActive = document.querySelectorAll('#controls.active, #pinyin-float-panel.active').length > 0;
+            mask.classList.toggle('active', anyActive);
+        }
+    }
+    function closeAllDrawers() {
+        document.querySelectorAll('#controls, #pinyin-float-panel').forEach(el => el.classList.remove('active'));
+        const mask = document.getElementById('drawer-mask');
+        if(mask) mask.classList.remove('active');
+    }
+
+    function openDB() {
+        return new Promise((resolve, reject) => {
+            const req = indexedDB.open(DB_NAME, DB_VERSION);
+            req.onupgradeneeded = e => {
+                const database = e.target.result;
+                [STORE_CUSTOM, STORE_BUILTIN].forEach(storeName => {
+                    if (!database.objectStoreNames.contains(storeName)) {
+                        database.createObjectStore(storeName, { keyPath: "id" });
+                    }
+                });
+                if (!database.objectStoreNames.contains(STORE_META)) {
+                    database.createObjectStore(STORE_META, { keyPath: "key" });
+                }
+            };
+            req.onsuccess = e => resolve(e.target.result);
+            req.onerror = e => reject(e.target.error);
+        });
+    }
+
+    function tx(storeName, mode = "readonly") { return db.transaction(storeName, mode).objectStore(storeName); }
+    function putRecord(storeName, value) {
+        return new Promise((resolve, reject) => {
+            const req = tx(storeName, "readwrite").put(value);
+            req.onsuccess = () => resolve(); req.onerror = e => reject(e.target.error);
+        });
+    }
+    function getRecord(storeName, key) {
+        return new Promise((resolve, reject) => {
+            const req = tx(storeName).get(key);
+            req.onsuccess = e => resolve(e.target.result); req.onerror = e => reject(e.target.error);
+        });
+    }
+    function getAllRecords(storeName) {
+        return new Promise((resolve, reject) => {
+            const req = tx(storeName).getAll();
+            req.onsuccess = e => resolve(e.target.result || []); req.onerror = e => reject(e.target.error);
+        });
+    }
+    function makeId(title) { return title.trim(); }
+    function getCurrentTitle() { return titleIn.value.trim() || "未命名经典"; }
+    function getCurrentStore() { return currentRoom === "builtin" ? STORE_BUILTIN : STORE_CUSTOM; }
+    function getCurrentId() { return currentRoom === "builtin" ? (currentSutraKey || getCurrentTitle()) : makeId(getCurrentTitle()); }
+    function getActiveMetaKey() { return currentRoom === "builtin" ? "activeBuiltinId" : "activeCustomId"; }
+    async function setMeta(key, value) { await putRecord(STORE_META, { key, value }); }
+    async function getMeta(key) { const item = await getRecord(STORE_META, key); return item ? item.value : null; }
+
+    function getCaretPosition() {
+        const sel = window.getSelection();
+        if (!sel.rangeCount) return inputLy.innerText.length;
+        const range = sel.getRangeAt(0);
+        const preRange = range.cloneRange();
+        try {
+            preRange.selectNodeContents(inputLy);
+            preRange.setEnd(range.endContainer, range.endOffset);
+            return preRange.toString().length;
+        } catch { return inputLy.innerText.length; }
+    }
+
+    function handleTitleInput() { updateTitle(); save(); }
+    function save() { clearTimeout(saveTimer); saveTimer = setTimeout(async () => { await saveCurrentSutra(); }, 500); }
+    async function saveNow() { clearTimeout(saveTimer); await saveCurrentSutra(); }
+
+    async function refreshSutraSelector() {
+        const selector = document.getElementById('sutra-selector');
+        if (!selector || !db) return;
+        const currentId = currentRoom === "custom" ? getCurrentId() : "";
+        const records = await getAllRecords(STORE_CUSTOM);
+        records.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+        selector.innerHTML = `<option value="">--- 自选经典 ---</option>`;
+        records.forEach(item => {
+            const opt = document.createElement("option");
+            opt.value = item.id; opt.textContent = item.title;
+            selector.appendChild(opt);
+        });
+        if (currentId && [...selector.options].some(o => o.value === currentId)) { selector.value = currentId; }
+    }
+
+    function setLockedView() {
+        sourceIn.readOnly = true;
+        const panel = document.getElementById('sync-panel');
+        if (panel) panel.style.display = 'flex';
+    }
+
+    async function loadSutraById(id) {
+        currentRoom = "custom"; currentSutraKey = ""; updateModeDisplay();
+        const item = await getRecord(STORE_CUSTOM, id);
+        if (!item) return;
+        titleIn.value = item.title || ""; updateTitle();
+        sourceIn.value = item.base || ""; baseLy.innerText = item.base || "";
+        inputLy.innerText = item.typed || ""; bookmarkDisplay.innerText = item.pinnedChap || "(品名)";
+        document.getElementById('total-run').innerText = item.totalRun || 0;
+        isCurrentRunCounted = (item.isCurrentRunCounted === undefined || item.isCurrentRunCounted === null) ? false : item.isCurrentRunCounted;
+        await setMeta("activeCustomId", id); await setMeta("activeRoom", "custom");
+        if (sourceIn.value) setLockedView();
+        updateCount();
+        await refreshSutraSelector();
+        const selector = document.getElementById('sutra-selector');
+        if (selector) { selector.value = id; }
+        setTimeout(goGoldEnd, 300);
+    }
+
+    async function previewSutra() {
+        const selector = document.getElementById('sutra-selector');
+        const pre = document.getElementById('sutra-preview');
+        if (!selector || !pre) return;
+        const value = selector.value;
+        if (!value) { pre.value = ""; return; }
+        const item = await getRecord(STORE_CUSTOM, value);
+        if (item) { pre.value = item.base || ""; await loadSutraById(value); }
+    }
+
+    async function importFromPreview(btn) {
+        currentRoom = "custom"; currentSutraKey = ""; updateModeDisplay();
+        const hasTyped = inputLy && inputLy.textContent.trim().length > 0;
+        if (hasTyped) { if (!confirm("⚠️ 即将替换当前底稿与抄经进度，是否继续？")) return; }
+        const previewArea = document.getElementById('sutra-preview');
+        const selector = document.getElementById('sutra-selector');
+        const content = (previewArea ? previewArea.value.trim() : "") || sourceIn.value.trim();
+        if (!content) { alert("原始经文为空，请先粘贴经文。"); return; }
+
+        titleIn.value = "";
+        const finalTitle = extractTitleFromSutraText(content) || "未命名经典";
+        if (!confirm(`确确认为《${finalTitle}》开库入藏并起笔？`)) return;
+
+        sourceIn.value = content; baseLy.innerText = content; inputLy.innerHTML = "";
+        setTitle(finalTitle);
+        bookmarkDisplay.innerText = finalTitle;
+        isCurrentRunCounted = false;
+        setLockedView(); updateCount();
+        await saveNow(); await refreshSutraSelector();
+        if (selector) selector.value = getCurrentId();
+        setTimeout(() => { activateCursorViaFirstCharacter(); }, 300);
+        if (previewArea) previewArea.value = "";
+    }
+
+    function updateTitle() {
+        const titleValue = titleIn.value.trim(); const baseValue = sourceIn.value.trim();
+        if (titleValue) { titleDisp.innerText = titleValue; return; }
+        if (baseValue) { titleDisp.innerText = "未命名经典"; return; }
+        titleDisp.innerText = "深入经藏 智慧如海";
+    }
+
+    function updateModeDisplay() {
+        const clearBtn = document.querySelector('button[onclick="clearBase()"]');
+        const titleInput = document.getElementById("title-input");
+
+        if (currentRoom === "builtin") {
+            if (titleInput) {
+                titleInput.readOnly = true;
+                titleInput.style.background = "#f5f5f5";
+                titleInput.style.color = "#666";
+                titleInput.style.cursor = "not-allowed";
+            }
+            if (clearBtn) {
+                clearBtn.disabled = true;
+                clearBtn.style.opacity = "0.4";
+                clearBtn.style.cursor = "not-allowed";
+            }
+        } else {
+            if (titleInput) {
+                titleInput.readOnly = false;
+                titleInput.style.background = "";
+                titleInput.style.color = "";
+                titleInput.style.cursor = "text";
+            }
+            if (clearBtn) {
+                clearBtn.disabled = false;
+                clearBtn.style.opacity = "1";
+                clearBtn.style.cursor = "pointer";
+            }
+        }
+
+        const el = document.getElementById("current-mode");
+        if (!el) return;
+
+        if (currentRoom === "builtin") {
+            el.innerText = "当前模式：📚 系统经藏";
+            el.style.background = "rgba(45,111,123,0.08)";
+            el.style.color = "var(--primary)";
+        } else {
+            el.innerText = "当前模式：🪶 自选经藏";
+            el.style.background = "rgba(184,134,11,0.10)";
+            el.style.color = "#9a6b00";
+        }
+    }
+
+    function isGenericOpeningLine(line) {
+        const clean = line.replace(/[\s　《》〈〉「」『』（）()：:，,。.!！?？、]/g, "");
+        return ["南无本师释迦牟尼佛","南無本師釋迦牟尼佛","开经偈","開經偈","无上甚深微妙法","無上甚深微妙法"].some(text => clean.includes(text));
+    }
+
+    function extractTitleFromSutraText(text) {
+        const lines = text.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+        const candidates = lines.slice(0, 5);
+        const canonPattern = /^大正藏第\s*\d+\s*册\s*No\.\s*\d+\s*(.+)$/i;
+        for (const line of candidates) {
+            if (isGenericOpeningLine(line)) continue;
+            const canonMatch = line.match(canonPattern);
+            if (canonMatch && canonMatch[1]) return canonMatch[1].replace(/[《》〈〉「」『』]/g, "").trim();
+            if (/^No\.\s*\d+/i.test(line) || /[，,、。.!！?？；;]/.test(line)) continue;
+            const clean = line.replace(/[《》〈〉「」『』（）()：:\s　]/g, "");
+            if (clean) return clean;
+        }
+        return "";
+    }
+
+    function cleanTextForMobile(rawText) {
+        if (window.innerWidth > 850 || !rawText) return rawText;
+        const paragraphs = rawText.split(/\r?\n/);
+        const finalizedLines = [];
+
+        paragraphs.forEach(para => {
+            let paraText = para.trim();
+            if (!paraText) { finalizedLines.push(""); return; }
+
+            const chars = Array.from(paraText);
+            let currentLine = "";
+
+            for (let i = 0; i < chars.length; i++) {
+                currentLine += chars[i];
+                if (currentLine.length === 14 || i === chars.length - 1) {
+                    const nextChar = chars[i + 1];
+                    if (nextChar && ["。", "，", "、", "；", "：", ".”", "°"].includes(nextChar)) {
+                        currentLine += nextChar;
+                        i++;
+                    }
+                    if (currentLine.startsWith("。") || currentLine.startsWith("，") || currentLine.startsWith("、")) {
+                        currentLine = currentLine.substring(1);
+                    }
+                    finalizedLines.push(currentLine);
+                    currentLine = "";
+                }
+            }
+        });
+        return finalizedLines.join("\n");
+    }
+
+    function setTitle(title) { 
+        if (title !== undefined) titleIn.value = title; 
+        updateTitle(); 
+    }
+
+    function syncText() { 
+        baseLy.innerText = cleanTextForMobile(sourceIn.value); 
+        updateTitle(); 
+        updateCount(); 
+        save(); 
+    }
+
+    function lockSource() { 
+        if (!sourceIn.value.trim()) return; 
+        baseLy.innerText = cleanTextForMobile(sourceIn.value);
+        setLockedView(); 
+        save(); 
+    }
+
+    function updateCount() {
+        const typedText = inputLy.innerText.replace(/\u200B/g, "");
+        
+        const cleanTyped = typedText.replace(/[\s\u200B\uFEFF\r\n\t]/g, "");
+        const cleanBase = sourceIn.value.replace(/[\s\u200B\uFEFF\r\n\t]/g, "");
+
+        const typedCount = Array.from(cleanTyped).length;
+        const baseCount = Array.from(cleanBase).length;
+        
+        document.getElementById('base-count').innerText = baseCount;
+        document.getElementById('char-count').innerText = typedCount;
+
+        const remainingChars = baseCount - typedCount;
+
+        if (baseCount > 0 && (typedCount >= baseCount || remainingChars <= 130)) {
+            if (!isCurrentRunCounted) {
+                isCurrentRunCounted = true; 
+                const runEl = document.getElementById('total-run');
+                if (runEl) {
+                    runEl.innerText = (parseInt(runEl.innerText) || 0) + 1;
+                }
+                save(); 
+                setTimeout(() => { 
+                    if (remainingChars > 0) {
+                        alert(`✨ 接近满愿！检测到剩余未抄字数已小于130字（当前剩余 ${remainingChars} 字），系统已提前为您记录入藏 1 遍。您可直接点击【再抄一遍】清净重书。`);
+                    } else {
+                        alert("✨ 功德圆满！本经已完整抄毕一遍，遍数已为您自动记录入藏。"); 
+                    }
+                }, 100);
+            }
+        }
+
+        if (typedCount >= 1) detectChapterName();
+    }
+
+    async function manualSave() {
+        try { await saveNow(); await refreshSutraSelector(); alert("已保存当前抄经进度 ✅"); } catch (e) { alert("保存失败"); }
+    }
+
+    function toggleCheckMode() {
+        const btn = document.getElementById('check-btn'); 
+        const warn = document.getElementById('error-warning'); 
+        if (!btn) return;
+        
+        isCheckMode = !isCheckMode;
+        
+        if (isCheckMode) {
+            btn.innerText = "🔍 校验中..."; 
+            btn.style.background = "#2d6f7b";
+            
+            const errData = findFirstErrorIndex();
+            if (errData.index >= 0) {
+                btn.innerText = "⚠️ 录入有误"; 
+                btn.style.background = "#e74c3c"; 
+                if (warn) warn.style.display = 'block';
+                
+                setTimeout(() => { 
+                    triggerErrorSequence(errData.index);
+                    if (confirm("检测到录入与底本有差异，是否由系统一键自动修正错字笔误？")) {
+                        autoFixText(); 
+                    } else {
+                        exitCheckMode();
+                    }
+                }, 180);
+            } else {
+                alert("当前录入完全正确！"); 
+                isCheckMode = false; 
+                btn.innerText = "🔍 开启校验"; 
+                btn.style.background = "var(--primary)";
+            }
+        } else {
+            exitCheckMode();
+        }
+    }
+
+    function autoFixText() {
+        clearTimeout(flashTimeout);
+        clearTimeout(bubbleTimeout);
+        const baseRaw = sourceIn.value || baseLy.innerText || ""; 
+        const typedRaw = (inputLy.innerText || "").replace(/\u200B/g, "").replace(/\uFEFF/g, "");
+        
+        if (!baseRaw.trim() || !typedRaw.trim()) {
+            exitCheckMode();
+            return;
+        }
+
+        const typedCharCount = Array.from(typedRaw).filter(ch => !/[\s\u3000]/.test(ch)).length;
+        const baseChars = Array.from(baseRaw); 
+        let count = 0; 
+        let endIndex = 0;
+        
+        for (let i = 0; i < baseChars.length; i++) {
+            if (!/[\s\u3000]/.test(baseChars[i])) count++;
+            endIndex = i + 1; 
+            if (count >= typedCharCount) break;
+        }
+
+        const oldBubble = document.getElementById("error-bubble");
+        if (oldBubble) oldBubble.remove();
+        removeHighlights();
+
+        inputLy.innerText = baseChars.slice(0, endIndex).join(""); 
+        
+        isCheckMode = false;
+        const btn = document.getElementById('check-btn'); 
+        const warn = document.getElementById('error-warning');
+        if (btn) { btn.innerText = "🔍 开启校验"; btn.style.background = "var(--primary)"; }
+        if (warn) warn.style.display = 'none';
+
+        updateCount(); 
+        save(); 
+        setTimeout(goGoldEnd, 50);
+    }
+
+    function exitCheckMode() {
+        isCheckMode = false;
+        clearTimeout(flashTimeout);
+        clearTimeout(bubbleTimeout);
+        const oldBubble = document.getElementById("error-bubble");
+        if (oldBubble) oldBubble.remove();
+        removeHighlights();
+
+        const warn = document.getElementById("error-warning");
+        if (warn) warn.style.display = "none";
+
+        const btn = document.getElementById('check-btn');
+        if (btn) {
+            btn.innerText = "🔍 开启校验";
+            btn.style.background = "var(--primary)";
+        }
+        goGoldEnd();
+    }
+
+    let bubbleTimeout = null;
+    let flashTimeout = null;
+
+    function findFirstErrorIndex() {
+        const baseChars = toChars(sourceIn.value || baseLy.innerText || "");
+        const typedChars = toChars(inputLy.innerText || "");
+        let firstIndex = -1;
+        let totalErrors = 0;
+
+        for (let i = 0; i < typedChars.length; i++) {
+            if (baseChars[i] !== undefined && typedChars[i] !== baseChars[i]) {
+                if (firstIndex === -1) firstIndex = i;
+                totalErrors++;
+            }
+        }
+        return { index: firstIndex, total: totalErrors };
+    }
+
+    function goErrorPosition(errorIndex, totalErrors) {
+        if (!inputLy) return;
+        const stage = document.getElementById('stage');
+
+        let textCharCount = 0;
+        let rawNodeOffset = -1;
+        let targetNode = null;
+
+        const walker = document.createTreeWalker(inputLy, NodeFilter.SHOW_TEXT, null);
+        let node;
+
+        while ((node = walker.nextNode())) {
+            const chars = Array.from(node.textContent);
+            for (let i = 0; i < chars.length; i++) {
+                if (/[\s\u200B\uFEFF\r\n\t]/.test(chars[i])) {
+                    continue;
+                }
+                if (textCharCount === errorIndex) {
+                    targetNode = node;
+                    rawNodeOffset = i;
+                    break;
+                }
+                textCharCount++;
+            }
+            if (targetNode) break;
+        }
+
+        if (targetNode && rawNodeOffset >= 0) {
+            const range = document.createRange();
+            range.setStart(targetNode, rawNodeOffset);
+            range.collapse(true);
+
+            const marker = document.createElement("span");
+            marker.textContent = "\u200B";
+            marker.style.display = "inline-block";
+            range.insertNode(marker);
+
+            requestAnimationFrame(() => {
+                const stageRect = stage.getBoundingClientRect();
+                const markerRect = marker.getBoundingClientRect();
+
+                const targetTop = stage.scrollTop + (markerRect.top - stageRect.top) - stage.clientHeight * 0.35;
+                stage.scrollTop = Math.max(0, targetTop);
+
+                setTimeout(() => {
+                    const correctedRect = marker.getBoundingClientRect();
+                    const finalX = correctedRect.left + (window.pageXOffset || document.documentElement.scrollLeft);
+                    const finalY = correctedRect.top + (window.pageYOffset || document.documentElement.scrollTop);
+                    showErrorBubble(finalX, finalY, errorIndex, totalErrors);
+                    flashErrorPosition(errorIndex);
+                    marker.remove();
+                }, 50);
+            });
+        }
+    }
+
+    function flashErrorPosition(errorIndex) {
+        if (!inputLy) return;
+        removeHighlights();
+
+        let textCharCount = 0;
+        let rawNodeOffset = -1;
+        let targetNode = null;
+
+        const walker = document.createTreeWalker(inputLy, NodeFilter.SHOW_TEXT, null);
+        let node;
+
+        while ((node = walker.nextNode())) {
+            const chars = Array.from(node.textContent);
+            for (let i = 0; i < chars.length; i++) {
+                if (/[\s\u200B\uFEFF\r\n\t]/.test(chars[i])) {
+                    continue;
+                }
+                if (textCharCount === errorIndex) {
+                    targetNode = node;
+                    rawNodeOffset = i;
+                    break;
+                }
+                textCharCount++;
+            }
+            if (targetNode) break;
+        }
+
+        if (targetNode && rawNodeOffset >= 0) {
+            const range = document.createRange();
+            range.setStart(targetNode, rawNodeOffset);
+            range.setEnd(targetNode, rawNodeOffset + 1);
+
+            const mark = document.createElement("span");
+            mark.className = "error-highlight";
+
+            try {
+                const sel = window.getSelection();
+                let savedOffset = 0, savedNode = null;
+                if(sel.rangeCount > 0) {
+                    const r = sel.getRangeAt(0);
+                    savedNode = r.startContainer; savedOffset = r.startOffset;
+                }
+
+                range.surroundContents(mark);
+                if(savedNode) {
+                    const newRange = document.createRange();
+                    try { newRange.setStart(savedNode, savedOffset); newRange.collapse(true); sel.removeAllRanges(); sel.addRange(newRange); } catch(e){}
+                }
+
+                clearTimeout(flashTimeout);
+                flashTimeout = setTimeout(() => {
+                    if (mark.parentNode) {
+                        mark.replaceWith(document.createTextNode(mark.textContent));
+                    }
+                }, 2000);
+            } catch (e) {}
+        }
+    }
+
+    function showErrorBubble(x, y, currentIndex, totalErrors) {
+        const oldBubble = document.getElementById("error-bubble");
+        if (oldBubble) oldBubble.remove();
+
+        if (totalErrors === undefined || typeof totalErrors !== 'number') {
+            const reScan = findFirstErrorIndex();
+            totalErrors = reScan.total;
+        }
+
+        const extraCount = totalErrors - 1;
+        let extraNotice = "";
+        let buttonHtml = "";
+
+        const closeBtnHtml = `
+            <button onclick="event.stopPropagation(); const ob = document.getElementById('error-bubble'); if(ob)ob.remove(); removeHighlights(); goGoldEnd();" 
+                    style="background: #f5f5f5; color: #666; border: 1px solid #ddd; padding: 4px 10px; font-size: 11px; border-radius: 6px; cursor: pointer; font-weight: bold; font-family: sans-serif; transition: 0.2s;">
+                知道了
+            </button>
+        `;
+
+        if (totalErrors > 1) {
+            extraNotice = `<div style="font-size:12px; font-weight:normal; color:#e74c3c; margin-top:5px; text-align:center;">
+                💡 除此处外，还有 <b style="color:#e74c3c;">${extraCount}</b> 处错字。
+            </div>`;
+            buttonHtml = `
+                <div style="margin-top: 8px; display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+                    ${closeBtnHtml}
+                    <button onclick="event.stopPropagation(); navigateToNextError(${currentIndex});" 
+                            style="background: var(--primary); color: white; border: none; padding: 4px 10px; font-size: 11px; border-radius: 6px; cursor: pointer; font-weight: bold; box-shadow: 0 1px 4px rgba(0,0,0,0.15); font-family: sans-serif;">
+                        下一处 ❯
+                    </button>
+                </div>`;
+        } else {
+            extraNotice = "";
+            buttonHtml = `
+                <div style="margin-top: 8px; text-align: right;">
+                    ${closeBtnHtml}
+                </div>`;
+        }
+
+        const bubble = document.createElement("div");
+        bubble.id = "error-bubble";
+        bubble.innerHTML = `
+            <div style="font-size:14px; margin-bottom:3px; color:#b8860b; font-family:'STKaiti', 'KaiTi', serif; text-align:center;">📜 提示：此处与底稿字形不同</div>
+            <div style="font-size:12px; font-weight:normal; color:#666; line-height:1.4; max-width:250px; text-align:left; font-family:sans-serif;">
+                请修改错字，可点击右下角的<b>【开启校验】</b>一键修正。
+            </div>
+            ${extraNotice}
+            ${buttonHtml}
+        `;
+
+        bubble.style.position = "absolute";
+        bubble.style.background = "rgba(255, 255, 255, 0.98)";
+        bubble.style.border = "2px solid var(--gold)";
+        bubble.style.borderRadius = "14px";
+        bubble.style.padding = "10px 14px";
+        bubble.style.fontWeight = "bold";
+        bubble.style.boxShadow = "0 4px 18px rgba(0,0,0,0.15)";
+        bubble.style.zIndex = "99999";
+        bubble.style.pointerEvents = "auto"; 
+
+        bubble.style.left = x + "px";
+        const yOffset = totalErrors > 1 ? 128 : 108; 
+        bubble.style.top = (y + window.pageYOffset - yOffset) + "px"; 
+        bubble.style.transform = "translateX(-50%)";
+
+        const tail = document.createElement("div");
+        tail.style.position = "absolute";
+        tail.style.left = "50%";
+        tail.style.bottom = "-6px";
+        tail.style.width = "10px";
+        tail.style.height = "10px";
+        tail.style.background = "#fff";
+        tail.style.borderRight = "2px solid var(--gold)";
+        tail.style.borderBottom = "2px solid var(--gold)";
+        tail.style.transform = "translateX(-50%) rotate(45deg)";
+        bubble.appendChild(tail);
+
+        document.body.appendChild(bubble);
+
+        const hideDuration = totalErrors > 1 ? 15000 : 9000;
+        clearTimeout(bubbleTimeout);
+        bubbleTimeout = setTimeout(() => {
+            if (bubble.parentNode) bubble.remove();
+        }, hideDuration);
+    }
+
+    function navigateToNextError(currentIdx) {
+        const baseChars = toChars(sourceIn.value || baseLy.innerText || "");
+        const typedChars = toChars(inputLy.innerText || "");
+        let nextIndex = -1;
+        let totalErrors = 0;
+
+        for (let i = 0; i < typedChars.length; i++) {
+            if (baseChars[i] !== undefined && typedChars[i] !== baseChars[i]) {
+                totalErrors++;
+                if (i > currentIdx && nextIndex === -1) {
+                    nextIndex = i;
+                }
+            }
+        }
+
+        if (nextIndex >= 0) {
+            goErrorPosition(nextIndex, totalErrors);
+        } else {
+            const reScan = findFirstErrorIndex();
+            if (reScan.index >= 0 && reScan.index !== currentIdx) {
+                goErrorPosition(reScan.index, reScan.total);
+            } else {
+                exitCheckMode();
+            }
+        }
+    }
+
+    function triggerErrorSequence(errorIndex) {
+        const errData = findFirstErrorIndex();
+        goErrorPosition(errorIndex, errData.total);
+    }
+
+    function removeHighlights() {
+        document.querySelectorAll(".error-highlight").forEach(el => {
+            el.replaceWith(document.createTextNode(el.textContent));
+        });
+    }
+
+    function toChars(text) { return Array.from((text || "").replace(/[\s\u200B\uFEFF]/g, "")); }
+    function performFullCheck() {
+        const baseChars = toChars(sourceIn.value || baseLy.innerText || ""); const typedChars = toChars(inputLy.innerText || "");
+        if (baseChars.length === 0 || typedChars.length === 0) return false;
+        for (let i = 0; i < typedChars.length; i++) { if (typedChars[i] !== baseChars[i] && baseChars[i] !== undefined) return true; }
+        return false;
+    }
+
+    function applySync() {
+        const syncInput = document.getElementById('sync-input'); if (!syncInput || !inputLy) return;
+        const textToInsert = syncInput.value.trim(); if (!textToInsert) return;
+        inputLy.focus(); inputLy.style.pointerEvents = "auto";
+        const selection = window.getSelection(); const range = document.createRange();
+        range.selectNodeContents(inputLy); range.collapse(false);
+        selection.removeAllRanges(); selection.addRange(range);
+        document.execCommand('insertText', false, textToInsert);
+        syncInput.value = ""; updateCount(); save();
+    }
+
+    function isChapterLine(line) {
+        const s = (line || "").trim(); if (!s) return false;
+        return /(品第|分第|卷第)[一二三四五六七八九十百千万0-9]+/.test(s) || /第[一二三四五六七八九十百千万0-9]+[品分卷]/.test(s) || /品$/.test(s);
+    }
+
+    function detectChapterName() {
+        const text = (inputLy.innerText || "").replace(/\u200B/g); const title = (titleIn.value || "").trim();
+        if (text.replace(/\s/g, "").length === 0 || !title) { bookmarkDisplay.innerText = "(品名)"; return; }
+        const lines = text.split(/\r?\n/); let latestChapterLine = "";
+        for (const line of lines) { if (isChapterLine(line.trim())) latestChapterLine = line.trim(); }
+        if (latestChapterLine) { if (bookmarkDisplay.innerText !== latestChapterLine) { bookmarkDisplay.innerText = latestChapterLine; save(); } return; }
+        if (title && bookmarkDisplay.innerText !== title) { bookmarkDisplay.innerText = title; save(); }
+    }
+
+    function goGoldEnd() {
+        if (!inputLy) return;
+        const stage = document.getElementById('stage');
+        inputLy.style.pointerEvents = "auto"; inputLy.contentEditable = "true"; inputLy.focus({ preventScroll: true });
+        const sel = window.getSelection(); 
+        sel.removeAllRanges();
+        const range = document.createRange();
+        range.selectNodeContents(inputLy); range.collapse(false);
+        sel.addRange(range);
+
+        const marker = document.createElement("span");
+        marker.textContent = "\u200B"; marker.style.display = "inline-block"; marker.style.width = "1px"; marker.style.height = "1em";
+        range.insertNode(marker);
+
+        requestAnimationFrame(() => {
+            const stageRect = stage.getBoundingClientRect(); const markerRect = marker.getBoundingClientRect();
+            const targetTop = stage.scrollTop + (markerRect.top - stageRect.top) - stage.clientHeight * 0.45;
+            stage.scrollTop = Math.max(0, targetTop);
+
+            const newRange = document.createRange(); newRange.setStartBefore(marker); newRange.collapse(true);
+            sel.removeAllRanges(); sel.addRange(newRange);
+            marker.remove(); inputLy.focus({ preventScroll: true });
+        });
+    }
+
+    function toggleMenu(e) { e.stopPropagation(); chapterMenu.style.display = (chapterMenu.style.display === 'flex') ? 'none' : 'flex'; }
+    function closeMenu() { chapterMenu.style.display = 'none'; }
+    function togglePanel(id) { const el = document.getElementById(id); el.style.display = (el.style.display === 'none') ? 'flex' : 'none'; }
+
+    function exportTxt() {
+        const cleanTyped = inputLy.innerText.replace(/\u200B/g, ""); const title = getCurrentTitle();
+        const blob = new Blob([`《${title}》\n\n${cleanTyped}`], { type: "text/plain;charset=utf-8" });
+        const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `${title}_抄经.txt`; a.click();
+    }
+
+    function togglePinyinMode(e) {
+        pinyinMode = (pinyinMode === "han") ? "zhuyin" : "han";
+        e.currentTarget.innerText = (pinyinMode === "zhuyin") ? "🟠 注音" : "🔤 拼音";
+    }
+
+    const ZHUYIN_INITIAL_MAP = { b:"ㄅ",p:"ㄆ",m:"ㄇ",f:"ㄈ",d:"ㄉ",t:"ㄊ",n:"ㄋ",l:"ㄌ",g:"ㄍ",k:"ㄎ",h:"ㄏ",j:"ㄐ",q:"ㄑ",x:"ㄒ",zh:"ㄓ",ch:"ㄔ",sh:"ㄕ",r:"ㄖ",z:"ㄗ",c:"ㄘ",s:"ㄙ" };
+    const ZHUYIN_FINAL_MAP = { a:"ㄚ",o:"ㄛ",e:"ㄜ",ai:"ㄞ",ei:"ㄟ",ao:"ㄠ",ou:"ㄡ",an:"ㄢ",en:"ㄣ",ang:"ㄤ",eng:"ㄥ",er:"ㄦ",i:"ㄧ",ia:"ㄧㄚ",ie:"ㄧㄝ",iao:"ㄧㄠ",iu:"ㄧㄡ",ian:"ㄧㄢ",in:"ㄧㄣ",iang:"ㄧㄤ",ing:"ㄧㄥ",iong:"ㄩㄥ",u:"ㄨ",ua:"ㄨㄚ",uo:"ㄨㄛ",uai:"ㄨㄞ",ui:"ㄨㄟ",uan:"ㄨㄢ",un:"ㄨㄣ",uang:"ㄨㄤ",ong:"ㄨㄥ",v:"ㄩ",ve:"ㄩㄝ",van:"ㄩㄢ",vn:"ㄩㄣ","ü":"ㄩ","üe":"ㄩㄝ","üan":"ㄩㄢ","ün":"ㄩㄣ" };
+    const ZHUYIN_SPECIAL_MAP = { zhi:"ㄓ",chi:"ㄔ",shi:"ㄕ",ri:"ㄖ",zi:"ㄗ",ci:"ㄘ",si:"ㄙ",yi:"ㄧ",ya:"ㄧㄚ",ye:"ㄧㄝ",yao:"ㄧㄠ",you:"ㄧㄡ",yan:"ㄧㄢ",yin:"ㄧㄣ",yang:"ㄧㄤ",ying:"ㄧㄥ",yong:"ㄩㄥ",wu:"ㄨ",wa:"ㄨㄚ",wo:"ㄨㄛ",wai:"ㄨㄞ",wei:"ㄨㄟ",wan:"ㄨㄢ",wen:"ㄨㄣ",wang:"ㄨㄤ",weng:"ㄨㄥ",yu:"ㄩ",yue:"ㄩㄝ",yuan:"ㄩㄢ",yun:"ㄩㄣ" };
+    const FIX_PINYIN = { "万":"wan4", "行":"xing2", "观":"guan1", "乐":"le4", "为":"wei2" };
+
+    function pinyinToZhuyin(py) {
+        if (!py) return ""; py = py.toLowerCase().trim().replace(/[1-5]$/, ""); py = py.replace(/ü/g, "v");
+        if (ZHUYIN_SPECIAL_MAP[py]) return ZHUYIN_SPECIAL_MAP[py];
+        let initial = ""; let final = py;
+        if (py.startsWith("zh") || py.startsWith("ch") || py.startsWith("sh")) { initial = py.slice(0, 2); final = py.slice(2); }
+        else if (ZHUYIN_INITIAL_MAP[py[0]]) { initial = py[0]; final = py.slice(1); }
+        return (ZHUYIN_INITIAL_MAP[initial] || "") + (ZHUYIN_FINAL_MAP[final] || final);
+    }
+
+    async function clearBase() {
+        if (currentRoom === "builtin") { alert("系统内置经典不能物理化除。"); return; }
+        const title = getCurrentTitle(); const id = getCurrentId(); const storeName = getCurrentStore();
+        if (!id || id === "未命名经典") return;
+        if (confirm(`确定删除《${title}》底稿吗？`) && confirm(`最后确认彻底删除？`)) {
+            for (let i = 1; i < 99999; i++) window.clearTimeout(i);
+            try {
+                if (!db) db = await openDB();
+                const transaction = db.transaction([storeName, STORE_META], "readwrite");
+                transaction.objectStore(storeName).delete(id);
+                transaction.objectStore(STORE_META).delete(getActiveMetaKey());
+                transaction.oncomplete = async () => {
+                    sourceIn.value = ""; sourceIn.readOnly = false; baseLy.innerText = ""; inputLy.innerHTML = ""; titleIn.value = ""; titleDisp.innerText = "深入经藏 智慧如海";
+                    await refreshSutraSelector(); updateCount(); alert("化除成功");
+                };
+            } catch (e) { alert("化除失败"); }
+        }
+    }
+
+    async function clearGold() {
+        const typedText = inputLy.innerText.replace(/\u200B/g, "");
+        const cleanTyped = typedText.replace(/[\s\u200B\uFEFF\r\n\t]/g, "");
+        const cleanBase = sourceIn.value.replace(/[\s\u200B\uFEFF\r\n\t]/g, "");
+
+        const typedCount = Array.from(cleanTyped).length;
+        const baseCount = Array.from(cleanBase).length;
+        const remainingChars = baseCount - typedCount;
+
+        if (confirm("确定要抹去当前进度，再抄一遍吗？")) {
+            clearTimeout(saveTimer);
+            const runEl = document.getElementById('total-run');
+
+            if (!isCurrentRunCounted) {
+                if (baseCount > 0 && remainingChars <= 130) {
+                    if (runEl) { runEl.innerText = (parseInt(runEl.innerText) || 0) + 1; }
+                    alert("✨ 功功德圆满！检测到剩余未抄字数小于130字，已为您计入 1 遍。");
+                } else {
+                    alert("进度已抹去。由于剩余未抄字数多于130字，本次不计入遍数，望下次一气呵成。");
+                }
+            } else {
+                alert("🧹 进度已清空。本遍功德先前已实时为您计入，不再重复累计。");
+            }
+
+            isCurrentRunCounted = false; 
+            inputLy.innerHTML = ""; 
+            updateCount();
+            try {
+                await saveCurrentSutra();
+                setTimeout(() => { activateCursorViaFirstCharacter(); }, 300);
+            } catch (e) { alert("存档失败"); }
+        }
+    }
+
+    function renderMenu() {
+        const select = document.getElementById("sutra-select"); if (!select) return;
+        select.innerHTML = "";
+        const firstOpt = document.createElement("option"); firstOpt.value = "RESET_INTERFACE"; firstOpt.textContent = "--- 系统经典 (点击回归初始) ---"; firstOpt.selected = true;
+        select.appendChild(firstOpt);
+        if (window.SUTRA_MENU && Array.isArray(window.SUTRA_MENU)) {
+            window.SUTRA_MENU.forEach(item => { const opt = document.createElement("option"); opt.value = item.key; opt.textContent = item.title; select.appendChild(opt); });
+        }
+    }
+
+    async function saveCurrentSutra() {
+        if (!db) return;
+        const title = getCurrentTitle(); const id = getCurrentId(); const storeName = getCurrentStore();
+        const base = sourceIn.value || ""; const typed = inputLy.innerText.replace(/\u200B/g, "");
+        if (!base.trim() && !typed.trim()) return;
+        const record = { 
+            id, room: currentRoom, title, base, typed, 
+            totalRun: parseInt(document.getElementById('total-run').innerText) || 0, 
+            pinnedChap: bookmarkDisplay.innerText || "(品名)", 
+            caret: getCaretPosition(), 
+            updatedAt: Date.now(),
+            isCurrentRunCounted: isCurrentRunCounted 
+        };
+        try {
+            await putRecord(storeName, record); await setMeta(getActiveMetaKey(), id); await setMeta("activeRoom", currentRoom);
+        } catch (err) { db = await openDB(); }
+    }
+
+    function startDBHeartbeat() {
+        setInterval(async () => {
+            if (!db) { try { db = await openDB(); } catch(e) {} return; }
+            try { const tx = db.transaction(STORE_META, "readonly"); tx.objectStore(STORE_META).get("activeCustomId"); } catch (err) { db = await openDB(); }
+        }, 10 * 60 * 1000);
+    }
+
+    async function loadSutra(key) {
+        const item = window.SUTRA_REGISTRY ? window.SUTRA_REGISTRY[key] : null; if (!item) return;
+        currentRoom = "builtin"; currentSutraKey = key; updateModeDisplay();
+        const saved = await getRecord(STORE_BUILTIN, key);
+        if (saved) {
+            titleIn.value = saved.title || item.title; sourceIn.value = saved.base || item.content;
+            baseLy.innerText = saved.base || item.content; inputLy.innerText = saved.typed || "";
+            bookmarkDisplay.innerText = saved.pinnedChap || "(品名)"; document.getElementById('total-run').innerText = saved.totalRun || 0;
+            isCurrentRunCounted = (saved.isCurrentRunCounted === undefined || saved.isCurrentRunCounted === null) ? false : saved.isCurrentRunCounted;
+        } else {
+            titleIn.value = item.title; sourceIn.value = item.content; baseLy.innerText = item.content;
+            inputLy.innerHTML = ""; bookmarkDisplay.innerText = item.title; document.getElementById('total-run').innerText = "0";
+            isCurrentRunCounted = false;
+        }
+        updateTitle(); setLockedView(); updateCount();
+        await setMeta("activeBuiltinId", key); await setMeta("activeRoom", "builtin"); await saveNow();
+        setTimeout(() => { activateCursorViaFirstCharacter(); }, 300);
+    }
+
+    async function exportBackup() {
+        const backupDb = await openDB(); 
+        const backup = { version: "2026.01", exportTime: new Date().toISOString(), stores: {} };
+        for (const storeName of Array.from(backupDb.objectStoreNames)) {
+            backup.stores[storeName] = await new Promise((res) => { 
+                const req = backupDb.transaction(storeName, "readonly").objectStore(storeName).getAll(); 
+                req.onsuccess = () => res(req.result); 
+            });
+        }
+        const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
+        const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+        const now = new Date(); 
+        a.download = `dengguan-backup-${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}.json`;
+        a.click(); alert("备份成功");
+    }
+
+    function importBackup() { document.getElementById("backupFile").click(); }
+
+    async function handleImport(event) {
+        const file = event.target.files[0]; 
+        if (!file) return;
+        
+        try {
+            const backup = JSON.parse(await file.text()); 
+            if (!confirm("覆盖会清空现有进度并加载备份，确认吗？")) return;
+            
+            for (const storeName of Object.keys(backup.stores)) {
+                const store = db.transaction(storeName, "readwrite").objectStore(storeName);
+                await new Promise(res => { store.clear().onsuccess = res; });
+                
+                for (const item of backup.stores[storeName]) {
+                    let finalItem = item;
+                    
+                    if (storeName === STORE_BUILTIN && window.SUTRA_REGISTRY) {
+                        const cloudSutra = window.SUTRA_REGISTRY[item.id];
+                        if (cloudSutra && cloudSutra.content) {
+                            console.log(`✨ 正在为《${item.title}》无缝同步云端最新修正底稿，仅继承您的抄经遍数与进度...`);
+                            finalItem.base = cloudSutra.content;
+                        }
+                    }
+                    
+                    await new Promise(res => { store.put(finalItem).onsuccess = res; });
+                }
+            }
+            
+            await refreshSutraSelector();
+            
+            const activeRoom = await getMeta("activeRoom");
+            const activeBuiltinId = await getMeta("activeBuiltinId");
+            const activeCustomId = await getMeta("activeCustomId");
+
+            if (activeRoom === "builtin" && activeBuiltinId) {
+                await loadSutra(activeBuiltinId);
+            } else if (activeRoom === "custom" && activeCustomId) {
+                await loadSutraById(activeCustomId);
+            }
+            
+            alert("导入成功！已为您自动融合云端最新纠错底稿，并完美恢复您的精进遍数与金色字进度。✅"); 
+            closeAllDrawers();
+        } catch (e) {
+            alert("导入失败，文件格式可能不正确。");
+        }
+    }
+
+    let helpTraditional = false;
+    const helpTradMap = { "经":"經","观":"觀","经典":"經典","經藏":"经藏","选择":"選擇","实现":"實現","点击":"點擊","按钮":"按鈕","摄":"幫","取":"取","内容":"內容","底稿":"底稿","生成":"生成","银":"銀","开始":"開始","层":"層","自动":"自動","保存":"保存","检":"檢","查":"查","正误":"正誤","累计":"累計","恢复":"恢復","打开":"打開","网址":"網址","分享":"分享","添加":"添加","出现":"出現","图标":"圖標","菜单":"菜單","更多":"更多","找到":"找到","桌面":"桌面","快捷":"快捷","确定":"確認","帮助":"幫助","解决":"解決","手机":"手機","步骤":"步驟","继续":"繼續","边":"邊","贴":"貼","右侧":"右側","自选":"自選","中间":"中間","将":"將","侧":"側","写":"寫","间":"間","选":"選","帮":"幫","关":"關","于":"於","随":"隨","时":"時","问":"問","后":"後","并":"並","会":"會","现":"現","栏目":"栏目","担心":"擔心","这样":"這樣","灵活":"靈活","熟识":"熟識","分成系统":"分成系統","两个系统":"兩個系統","系统的":"系統等","设置":"設置","错":"錯","为了让":"為了讓","并点击":"並點擊","屏":"螢","屏幕":"螢幕","拼音示例":"拼音範例","标准音":"標準音","咒语发音参考":"咒語發音參考","输入错别字代替某疑难字":"輸入错字代替某疑難字","然后按此按钮即可":"然後按此按鈕即可" };
+
+    function helpToTrad(text){
+        Object.keys(helpTradMap).forEach(k=>{ text = text.split(k).join(helpTradMap[k]); });
+        return text;
+    }
+
+    document.getElementById("help-trad-toggle").onclick = function(){
+        helpTraditional = !helpTraditional;
+        this.innerText = helpTraditional ? "繁體" : "简体";
+        const box = document.getElementById("help-content"); if(!box) return;
+        if(helpTraditional){ box.dataset.origin = box.innerHTML; box.innerHTML = helpToTrad(box.innerHTML); }
+        else { box.innerHTML = box.dataset.origin; }
+    };
+
+    window.onload = async () => {
+        renderMenu();
+        const sysSelect = document.getElementById("sutra-select");
+        if (sysSelect) {
+            sysSelect.addEventListener("change", async function () {
+                if (this.value === "RESET_INTERFACE") {
+                    sourceIn.value = ""; baseLy.innerText = ""; inputLy.innerHTML = "";
+                    if (titleIn) titleIn.value = "";
+                    if (bookmarkDisplay) bookmarkDisplay.innerText = "(品名)";
+                    updateTitle(); sourceIn.readOnly = false;
+                    const panel = document.getElementById('sync-panel'); if (panel) panel.style.display = 'none';
+                    isCurrentRunCounted = false;
+                    updateCount(); closeAllDrawers();
+                } else if (this.value) {
+                    await loadSutra(this.value);
+                    setTimeout(() => { closeAllDrawers(); }, 100);
+                }
+            });
+        }
+
+        const selector = document.getElementById("sutra-selector");
+        if (selector) {
+            selector.addEventListener("change", async function () {
+                if (!this.value) {
+                    currentRoom = "custom"; currentSutraKey = "";
+                    sourceIn.value = ""; baseLy.innerText = ""; inputLy.innerHTML = ""; titleIn.value = "";
+                    bookmarkDisplay.innerText = "(品名)"; document.getElementById("total-run").innerText = "0";
+                    sourceIn.readOnly = false; titleIn.readOnly = false;
+                    const panel = document.getElementById("sync-panel"); if (panel) panel.style.display = "none";
+                    isCurrentRunCounted = false;
+                    updateTitle(); updateCount(); updateModeDisplay();
+                    setTimeout(() => { closeAllDrawers(); }, 100); return;
+                }
+                await loadSutraById(this.value);
+                setTimeout(() => { closeAllDrawers(); }, 100);
+            });
+        }
+
+        if (sourceIn) {
+            sourceIn.addEventListener("paste", function (e) {
+                if (inputLy && inputLy.textContent.trim().length > 0) {
+                    if (!confirm("⚠️ 即将替换当前底稿与抄经进度，是否继续？")) e.preventDefault();
+                }
+            });
+        }
+
+        db = await openDB();
+        startDBHeartbeat();
+        await refreshSutraSelector();
+
+        const activeRoom = await getMeta("activeRoom");
+        const activeBuiltinId = await getMeta("activeBuiltinId");
+        const activeCustomId = await getMeta("activeCustomId");
+
+        if (activeRoom === "builtin" && activeBuiltinId && sysSelect) {
+            sysSelect.value = activeBuiltinId;
+        } else if (activeRoom === "custom" && activeCustomId && selector) {
+            selector.value = activeCustomId;
+        }
+
+        if (activeRoom === "custom" && activeCustomId) { 
+            await loadSutraById(activeCustomId); 
+        } else if (activeRoom === "builtin" && activeBuiltinId) { 
+            await loadSutra(activeBuiltinId); 
+        } else { 
+            if (titleIn) titleIn.value = ""; 
+            updateTitle(); updateCount(); 
+        }
+
+        setTimeout(() => {
+            const warn = document.getElementById("error-warning");
+            if (!isCheckMode && inputLy.innerText.trim() && performFullCheck()) {
+                const errData = findFirstErrorIndex(); 
+                if (errData.index >= 0) {
+                    if (warn) warn.style.display = "none"; 
+                    setTimeout(() => { goErrorPosition(errData.index, errData.total); }, 400);
+                }
+            } else {
+                if (warn) warn.style.display = "none";
+                if (sourceIn.value.trim() !== "") { goGoldEnd(); }
+            }
+        }, 1200);
+
+        updateModeDisplay();
+        document.getElementById("title-input").readOnly = (currentRoom === "builtin");
+
+        document.getElementById('stage').addEventListener('click', (e) => {
+            if (e.target.closest('#pinyin-float-panel') || e.target.closest('#controls') || e.target.tagName === 'BUTTON') return;
+            setTimeout(() => {
+                const sel = window.getSelection(); if (sel.toString().trim().length > 0) return;
+                inputLy.style.pointerEvents = "auto"; inputLy.contentEditable = "true"; inputLy.focus({ preventScroll: true });
+                if(e.target === document.getElementById('paper') || e.target === document.getElementById('stage')) { goGoldEnd(); }
+            }, 50);
+        });
+
+        setInterval(() => { saveNow(); }, 10 * 60 * 1000);
+        startTypoWatcher();
+    };
+
+    window.addEventListener('beforeunload', () => { try { saveNow(); } catch (e) {} });
+
+    function fixIphoneSELayout() {
+        if (window.innerWidth <= 380) {
+            setTimeout(() => {
+                if (baseLy && inputLy) { inputLy.style.minHeight = baseLy.offsetHeight + 'px'; }
+            }, 100);
+        }
+    }
+    window.addEventListener('resize', fixIphoneSELayout);
+    fixIphoneSELayout();
+
+    async function activateCursorViaFirstCharacter() {
+        let baseText = sourceIn.value.trim() || baseLy.innerText.trim(); if (!baseText) return;
+        let currentTyped = inputLy.innerText.replace(/\u200B/g, "").trim();
+        if (currentTyped.length === 0) {
+            const firstCharMatch = baseText.match(/[^\s\u3000]/);
+            if (firstCharMatch) inputLy.innerHTML = `${firstCharMatch[0]}\uFEFF`;
+        } 
+        inputLy.style.pointerEvents = "auto"; inputLy.contentEditable = "true";
+        setTimeout(() => {
+            inputLy.focus({ preventScroll: true });
+            const sel = window.getSelection(); const range = document.createRange();
+            range.selectNodeContents(inputLy); range.collapse(false);
+            sel.removeAllRanges(); sel.addRange(range);
+            goGoldEnd(); inputLy.click();
+        }, 50);
+        updateCount(); await saveNow();
+    }
+
+    function showHelp() { const modal = document.getElementById("help-modal"); if (modal) modal.style.display = "flex"; }
+    function hideHelp() { const modal = document.getElementById("help-modal"); if (modal) modal.style.display = "none"; }
+    function clearPreview() { const pre = document.getElementById('sutra-preview'); if (pre) { pre.value = ""; pre.focus(); } }
+
+    function resetInterface() {
+        if (confirm("仅清空当前屏幕显示，不删除数据库记录。确定吗？")) {
+            sourceIn.value = ""; baseLy.innerText = ""; inputLy.innerHTML = ""; titleIn.value = "";
+            updateTitle(); sourceIn.readOnly = false;
+            const panel = document.getElementById('sync-panel'); if (panel) panel.style.display = 'none';
+            isCurrentRunCounted = false;
+            updateCount();
+        }
+    }
+
+    function resetRunCount() { if (confirm("确定要将本经的遍数清零吗？")) { const runEl = document.getElementById('total-run'); if (runEl) { runEl.innerText = "0"; isCurrentRunCounted = false; saveCurrentSutra(); } } }
+
+    async function startTypoWatcher() {
+        if (typoCheckTimer) { clearInterval(typoCheckTimer); }
+        typoCheckTimer = setInterval(() => {
+            if (document.hidden || isComposingText || isCheckMode) return;
+            
+            const typedText = (inputLy.innerText || "").replace(/[\s\u200B\uFEFF\r\n\t]/g, "");
+            const typedCount = Array.from(typedText).length;
+
+            if (typedCount < 20) return;
+            
+            if (performFullCheck()) {
+                const errData = findFirstErrorIndex();
+                if (errData.index >= 0) { 
+                    goErrorPosition(errData.index, errData.total); 
+                }
+            }
+        }, 15 * 60 * 1000);
+    }
+
+    let isComposingText = false;
+    inputLy.addEventListener('compositionstart', () => isComposingText = true);
+    inputLy.addEventListener('compositionend', () => { isComposingText = false; setTimeout(updateCount, 0); save(); });
+    inputLy.addEventListener('input', () => { if (!isComposingText) { updateCount(); save(); } });
+
+    function getPinyinText(text) {
+        if (Array.from(text).length !== 1) return pinyinPro.pinyin(text, { toneType: "none" });
+        if (window.SpecialPinyin?.get?.(text)) return window.SpecialPinyin.get(text).display;
+        return FIX_PINYIN[text] ? FIX_PINYIN[text].replace(/[1-5]$/, "") : pinyinPro.pinyin(text, { toneType: "none" });
+    }
+
+    document.addEventListener('selectionchange', () => {
+        const selectedText = window.getSelection().toString().trim();
+        if (!selectedText || selectedText.length > 3) return;
+        const pyDisp = document.getElementById('py-display'); const pyChar = document.getElementById('py-char'); if (!pyDisp || !pyChar) return;
+        const isSingleChar = Array.from(selectedText).length === 1;
+        if (isSingleChar && window.SpecialPinyin?.get?.(selectedText)) {
+            const ext = window.SpecialPinyin.get(selectedText);
+            pyDisp.innerText = (pinyinMode === "zhuyin") ? ext.zhuyin : ext.display; pyChar.innerText = selectedText; return;
+        }
+        const pyText = getPinyinText(selectedText);
+        pyDisp.innerText = (pinyinMode === "zhuyin") ? pyText.split(" ").map(pinyinToZhuyin).join("") : pyText;
+        pyChar.innerText = selectedText;
+    });
+    </script>
+
+    <script>
+        // 动态读取最顶部的 window.DGBJ_VERSION 变量，开屏瞬间无感印刷，让样式完美闭环
+        document.getElementById("dynamic-title").innerText = "等观笔耕v" + window.DGBJ_VERSION + " 经藏版";
+    </script>
+
+    <script src="./sutras.js"></script>
+    <script src="./sutras/xj-s.js"></script>
+    <script src="./sutras/xj-t.js"></script>
+    <script src="./sutras/fhj-s.js"></script>
+    <script src="./sutras/fhj-t.js"></script>
+    <script src="./sutras/bwj-s.js"></script>
+    <script src="./sutras/bwj-t.js"></script>
+    <script src="./sutras/test-1.js"></script>
+    <script src="./sutras/jgj-s.js"></script>
+    <script src="./sutras/jgj-t.js"></script>
+    <script src="./sutras/dzj-s.js"></script>
+    <script src="./sutras/dzj-t.js"></script>
+    <script src="./sutras/amtj-s.js"></script>
+    <script src="./sutras/amtj-t.js"></script>
+    <script src="./sutras/wlsj-s.js"></script>
+    <script src="./sutras/wlsj-t.js"></script>
+    <script src="./sutras/gwlsfj-s.js"></script>
+    <script src="./sutras/gwlsfj-t.js"></script>
+    <script src="./sutras/dsznfj-s.js"></script>
+    <script src="./sutras/dsznfj-t.js"></script>
+    <script src="./sutras/pxxypj-s.js"></script>
+    <script src="./sutras/pxxypj-t.js"></script>
+    <script src="./sutras/xwbftgdj-s.js"></script>
+    <script src="./sutras/xwbftgdj-t.js"></script>
+    <script src="./sutras/bhj-s.js"></script>
+    <script src="./sutras/bhj-t.js"></script>
+    <script src="./sutras/lyj-s.js"></script>
+    <script src="./sutras/lyj-t.js"></script>
+    <script src="./sutras/ysj-s.js"></script>
+    <script src="./sutras/ysj-t.js"></script>
+    <script src="./sutras/hyj40-s.js"></script>
+    <script src="./sutras/hyj40-t.js"></script>
+    <script src="./sutras/hyj80-s.js"></script>
+    <script src="./sutras/hyj80-t.js"></script>
+    <script src="./sutras/acfj-s.js"></script>
+    <script src="./sutras/acfj-t.js"></script>
+    <script src="./sutras/npj-s.js"></script>
+    <script src="./sutras/npj-t.js"></script>
+    <script src="./sutras/npjh-s.js"></script>
+    <script src="./sutras/npjh-t.js"></script>
+    <script src="./sutras/dbj-s.js"></script>
+    <script src="./sutras/dbj-t.js"></script>
+    <script src="./sutras/dzslj-s.js"></script>
+    <script src="./sutras/dzslj-t.js"></script>
+    <script src="./sutras/yjj-s.js"></script>
+    <script src="./sutras/yjj-t.js"></script>
+    <script src="./sutras/fgdj-s.js"></script>
+    <script src="./sutras/fgdj-t.js"></script>
+    <script src="./sutras/cjgdj-s.js"></script>
+    <script src="./sutras/cjgdj-t.js"></script>
+    <script src="./sutras/fmenj-s.js"></script>
+    <script src="./sutras/fmenj-t.js"></script>
+    <script src="./sutras/jyzj-s.js"></script>
+    <script src="./sutras/jyzj-t.js"></script>
+    <script src="./sutras/mlcfj-s.js"></script>
+    <script src="./sutras/mlcfj-t.js"></script>
+    <script src="./sutras/dhxj-s.js"></script>
+    <script src="./sutras/dhxj-t.js"></script>
+    <script src="./sutras/gysjj-s.js"></script>
+    <script src="./sutras/gysjj-t.js"></script>
+    <script src="./sutras/jsmj-s.js"></script>
+    <script src="./sutras/jsmj-t.js"></script>
+    <script src="./sutras/dsqj-s.js"></script>
+    <script src="./sutras/dsqj-t.js"></script>
+    <script src="./sutras/syftj-s.js"></script>
+    <script src="./sutras/syftj-t.js"></script>
+    <script src="./sutras/wmjj-s.js"></script>
+    <script src="./sutras/wmjj-t.js"></script>
+    <script src="./sutras/ysqfj-s.js"></script>
+    <script src="./sutras/ysqfj-t.js"></script>
+    <script src="./sutras/yfj-s.js"></script>
+    <script src="./sutras/yfj-t.js"></script>
+    <script src="./sutras/xdgj-s.js"></script>
+    <script src="./sutras/xdgj-t.js"></script>
+
+</body>
+</html>
