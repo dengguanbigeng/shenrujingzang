@@ -56,6 +56,11 @@
         '𠸪': { display: 'luo', zhuyin: 'ㄌㄨㄛ' },
         '㘓': { display: 'lan', zhuyin: 'ㄌㄢ' },
         '䫂': { display: 'duo', zhuyin: 'ㄉㄨㄛ' },
+        '𪙁': { display: 'zha', zhuyin: 'ㄓㄚ' },
+        '㘁': { display: 'yi', zhuyin: 'ㄧ' },
+        '䶩': { display: 'ji', zhuyin: 'ㄐㄧ' },
+        '㔸': { display: 'ti', zhuyin: 'ㄊㄧ' },
+        '𠥶': { display: 'ti', zhuyin: 'ㄊㄧ' },
 
 
 
