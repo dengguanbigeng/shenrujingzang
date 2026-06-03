@@ -12,7 +12,17 @@
     <link rel="icon" type="image/png" href="favicon.png">
 
     <script>
-        window.DGBJ_VERSION = "2026.12"; 
+        (function() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            
+            // 自动生成形如 202606031235 的纯数字版本号
+            window.DGBJ_VERSION = `${year}${month}${day}${hours}${minutes}`;
+        })();
     </script>
 
     <script>
@@ -28,7 +38,7 @@
                 });
             }
             console.log("🚀 检测到笔耕新版 v" + CURRENT_VERSION + "，正在自动洗净缓存...");
-            window.location.reload(true);
+            window.location.reload(true); // 只要版本号（时间）变了，这里会安全地强制刷新整页文件
         }
     })();
     </script>
@@ -40,6 +50,7 @@
         gtag('js', new Date());
         gtag('config', 'G-QGSWBD4P37');
     </script>
+
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-screen-webfont@1.1.0/style.css" />
     <script src="https://unpkg.com/pinyin-pro" onerror="this.onerror=null; document.write('<script src=\'pinyin-pro.js\'><\/script>')"></script>
@@ -399,6 +410,7 @@
 
     .help-modal-box p { margin:7px 0; }
     .system-title-box { display: flex; flex-direction: column; align-items: center; margin-bottom: 18px; }
+
     .wenshu-sign { height: 34px; width: 180px; margin-top: -6px; margin-bottom: 8px; opacity: 0.88; }
 
     @media screen and (max-width: 1024px) {
@@ -552,17 +564,23 @@
 
     <div class="drawer-mask" id="drawer-mask" onclick="closeAllDrawers()"></div>
 
-    <div class="app-container">
+
+<div class="app-container">
         
         <div id="controls">
-            <div class="system-title-box">
-                <h2 id="dynamic-title">等观笔耕v 经藏版</h2>
-                <img src="./images/wenshu-sign.png" class="wenshu-sign" alt="伦敦文殊精舍">
+            <div class="system-title-box" style="display: flex; flex-direction: column; align-items: center; margin-top: -12px !important; margin-bottom: 12px; width: 100%;">
+                <h2 id="dynamic-title" style="font-family: 'Noto Serif SC', 'Source Han Serif SC', 'SimSun', 'STSong', serif !important; font-size: 15px !important; font-weight: 600 !important; color: #aaa !important; opacity: 0.85 !important; text-align: center; margin: 0 0 6px 0 !important; line-height: 1.4 !important; letter-spacing: 1px;">等观笔耕v<br>经藏版</h2>
+                <img src="./images/wenshu-sign.png" class="wenshu-sign" alt="伦敦文殊精舍" style="margin: 0 !important; max-width: 100%;">
             </div>
 
-            <div class="section-title">经文标题</div>
-            <input type="text" id="title-input" placeholder="请输入经名..." oninput="handleTitleInput()" autocomplete="off" style="margin-bottom: 6px;">
-
+          
+          <div class="section-title">经文标题</div>
+<div style="display: flex; gap: 6px; margin-bottom: 6px;">
+    <input type="text" id="title-input" placeholder="请输入经名..." autocomplete="off" style="flex-grow: 1; margin: 0; padding: 6px 8px; height: 30px; box-sizing: border-box;">
+    <button id="title-confirm-btn" onclick="handleTitleConfirm()" disabled style="background: var(--primary); padding: 0 12px; border-radius: 6px; font-size: 12px; flex-shrink: 0; height: 30px; line-height: 30px; border: none; color: #fff; opacity: 0.5; cursor: not-allowed;">确认</button>
+</div>
+            
+           
             <div class="source-wrapper">
                 <textarea id="source-input" oninput="syncText()" style="position: absolute; left: -9999px; top: -9999px; width: 1px; height: 1px; opacity: 0; pointer-events: none;" placeholder="在此粘贴经文原文作为底稿..." autocomplete="off"></textarea>
 
@@ -627,7 +645,7 @@
             <div style="display: flex; flex-direction: column; width: 100%; flex-grow: 1;">
                 <div style="width: 100%; margin-bottom: 8px;">
                     <select id="sutra-selector" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--gold); font-size: 12px;">
-                        <option value="">--- 从经藏中调出进度 ---</option>
+                        <option value="">--- 自选经典目录 ---</option>
                     </select>
                 </div>
 
@@ -784,24 +802,100 @@
         } catch { return inputLy.innerText.length; }
     }
 
-    function handleTitleInput() { updateTitle(); save(); }
-    function save() { clearTimeout(saveTimer); saveTimer = setTimeout(async () => { await saveCurrentSutra(); }, 500); }
-    async function saveNow() { clearTimeout(saveTimer); await saveCurrentSutra(); }
 
-    async function refreshSutraSelector() {
-        const selector = document.getElementById('sutra-selector');
-        if (!selector || !db) return;
-        const currentId = currentRoom === "custom" ? getCurrentId() : "";
-        const records = await getAllRecords(STORE_CUSTOM);
-        records.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
-        selector.innerHTML = `<option value="">--- 自选经典 ---</option>`;
-        records.forEach(item => {
-            const opt = document.createElement("option");
-            opt.value = item.id; opt.textContent = item.title;
-            selector.appendChild(opt);
-        });
-        if (currentId && [...selector.options].some(o => o.value === currentId)) { selector.value = currentId; }
+
+// ==================== 🌟 经名确认与档案安全平移控制总线 ====================
+let oldSutraTitle = "";
+
+// 1. 鼠标点进输入框的瞬间，死死记住改名之前的极旧标题，作为底层平移档案的绝对依据
+const titleInputElement = document.getElementById('title-input');
+if (titleInputElement) {
+    titleInputElement.addEventListener('focus', () => {
+        oldSutraTitle = titleInputElement.value.trim();
+    });
+}
+
+// 2. 🌟 核心替代函数：只有亲自按下“确认”键，才执行大标题、品名签和数据库的归正搬家
+async function handleTitleConfirm() {
+    const newTitle = getCurrentTitle();
+    
+    if (!newTitle || newTitle === "未命名经典") {
+        alert("请输入有效的经文标题。");
+        return;
     }
+
+    // 如果在自选模式下，且用户确实把旧名字改成了新名字，触发移魂大法
+    if (currentRoom === "custom" && oldSutraTitle && newTitle && oldSutraTitle !== newTitle) {
+        try {
+            const oldId = oldSutraTitle;
+            const newId = newTitle;
+            const oldRecord = await getRecord(STORE_CUSTOM, oldId);
+            
+            if (oldRecord) {
+                // 完美承接所有的抄经功德、底稿和金色字进度
+                oldRecord.id = newId;
+                oldRecord.title = newTitle;
+                oldRecord.updatedAt = Date.now();
+                
+                // 将新名字档案安座落库
+                await putRecord(STORE_CUSTOM, oldRecord);
+                
+                // 斩草除根：立刻物理化除掉那个极旧名字的空壳躯壳
+                const transaction = db.transaction([STORE_CUSTOM], "readwrite");
+                transaction.objectStore(STORE_CUSTOM).delete(oldId);
+                
+                console.log(`✨ 成功将《${oldId}》功德平移至新经名《${newId}》`);
+            }
+        } catch (e) {
+            console.error("平移微调中:", e);
+        }
+    }
+
+    // 同步刷新左侧大标题和黄色品名签
+    updateTitle();
+    if (bookmarkDisplay) {
+        bookmarkDisplay.innerText = newTitle;
+    }
+
+    // 交接新接力棒，并立刻触发一次强制落库保存与菜单刷新
+    oldSutraTitle = newTitle;
+    await saveNow();
+    await refreshSutraSelector();
+    
+    alert(`《${newTitle}》标题已确认归正！✅`);
+}
+
+// 3. 核心保存机制（去除了对旧 handleTitleInput 的依赖）
+function save() { 
+    clearTimeout(saveTimer); 
+    saveTimer = setTimeout(async () => { await saveCurrentSutra(); }, 500); 
+}
+
+async function saveNow() { 
+    clearTimeout(saveTimer); 
+    await saveCurrentSutra(); 
+}
+
+// 4. 自选经典下拉菜单刷新引擎（保持原汁原味的排布与最新排序）
+async function refreshSutraSelector() {
+    const selector = document.getElementById('sutra-selector');
+    if (!selector || !db) return;
+    const currentId = currentRoom === "custom" ? getCurrentId() : "";
+    const records = await getAllRecords(STORE_CUSTOM);
+    records.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+    selector.innerHTML = `<option value="">--- 自选经典目录 ---</option>`;
+    records.forEach(item => {
+        const opt = document.createElement("option");
+        opt.value = item.id; opt.textContent = item.title;
+        selector.appendChild(opt);
+    });
+    if (currentId && [...selector.options].some(o => o.value === currentId)) { 
+        selector.value = currentId; 
+    }
+}
+
+
+
 
     function setLockedView() {
         sourceIn.readOnly = true;
@@ -809,7 +903,9 @@
         if (panel) panel.style.display = 'flex';
     }
 
-    async function loadSutraById(id) {
+
+
+  async function loadSutraById(id) {
         currentRoom = "custom"; currentSutraKey = ""; updateModeDisplay();
         const item = await getRecord(STORE_CUSTOM, id);
         if (!item) return;
@@ -821,11 +917,22 @@
         await setMeta("activeCustomId", id); await setMeta("activeRoom", "custom");
         if (sourceIn.value) setLockedView();
         updateCount();
+
+        // 🌟【核心修复补丁】在数据完全加载、视图更新完毕后，强行把确认键全面唤醒，恢复饱满颜色与点击光标
+        const confirmBtn = document.getElementById('title-confirm-btn');
+        if (confirmBtn) {
+            confirmBtn.disabled = false;
+            confirmBtn.style.opacity = "1";
+            confirmBtn.style.cursor = "pointer";
+        }
+
         await refreshSutraSelector();
         const selector = document.getElementById('sutra-selector');
         if (selector) { selector.value = id; }
         setTimeout(goGoldEnd, 300);
     }
+
+
 
     async function previewSutra() {
         const selector = document.getElementById('sutra-selector');
@@ -868,9 +975,12 @@
         titleDisp.innerText = "深入经藏 智慧如海";
     }
 
-    function updateModeDisplay() {
+
+function updateModeDisplay() {
         const clearBtn = document.querySelector('button[onclick="clearBase()"]');
         const titleInput = document.getElementById("title-input");
+        // 🌟 新增：精准抓取经名确认按钮
+        const confirmBtn = document.getElementById('title-confirm-btn');
 
         if (currentRoom === "builtin") {
             if (titleInput) {
@@ -884,6 +994,12 @@
                 clearBtn.style.opacity = "0.4";
                 clearBtn.style.cursor = "not-allowed";
             }
+            // 🌟 新增：系统经典状态下，强制将确认键打入冷宫，同步熄灭
+            if (confirmBtn) {
+                confirmBtn.disabled = true;
+                confirmBtn.style.opacity = "0.4";
+                confirmBtn.style.cursor = "not-allowed";
+            }
         } else {
             if (titleInput) {
                 titleInput.readOnly = false;
@@ -895,6 +1011,12 @@
                 clearBtn.disabled = false;
                 clearBtn.style.opacity = "1";
                 clearBtn.style.cursor = "pointer";
+            }
+            // 🌟 新增：自选经典状态下，重新全面唤醒确认键，恢复饱满原色与点击光标
+            if (confirmBtn) {
+                confirmBtn.disabled = false;
+                confirmBtn.style.opacity = "1";
+                confirmBtn.style.cursor = "pointer";
             }
         }
 
@@ -910,7 +1032,8 @@
             el.style.background = "rgba(184,134,11,0.10)";
             el.style.color = "#9a6b00";
         }
-    }
+}
+
 
     function isGenericOpeningLine(line) {
         const clean = line.replace(/[\s　《》〈〉「」『』（）()：:，,。.!！?？、]/g, "");
@@ -1488,24 +1611,60 @@ function showErrorBubble(x, y, currentIndex, totalErrors) {
         return (ZHUYIN_INITIAL_MAP[initial] || "") + (ZHUYIN_FINAL_MAP[final] || final);
     }
 
-    async function clearBase() {
-        if (currentRoom === "builtin") { alert("系统内置经典不能物理化除。"); return; }
-        const title = getCurrentTitle(); const id = getCurrentId(); const storeName = getCurrentStore();
-        if (!id || id === "未命名经典") return;
-        if (confirm(`确定删除《${title}》底稿吗？`) && confirm(`最后确认彻底删除？`)) {
-            for (let i = 1; i < 99999; i++) window.clearTimeout(i);
-            try {
-                if (!db) db = await openDB();
-                const transaction = db.transaction([storeName, STORE_META], "readwrite");
-                transaction.objectStore(storeName).delete(id);
-                transaction.objectStore(STORE_META).delete(getActiveMetaKey());
-                transaction.oncomplete = async () => {
-                    sourceIn.value = ""; sourceIn.readOnly = false; baseLy.innerText = ""; inputLy.innerHTML = ""; titleIn.value = ""; titleDisp.innerText = "深入经藏 智慧如海";
-                    await refreshSutraSelector(); updateCount(); alert("化除成功");
-                };
-            } catch (e) { alert("化除失败"); }
-        }
+
+
+    // 🌟 彻底重塑物理化除底稿函数（全面规整版：完美清洗品名、遍数、防止死锁残留）
+async function clearBase() {
+    if (currentRoom === "builtin") { alert("系统内置经典不能物理化除。"); return; }
+    const title = getCurrentTitle(); const id = getCurrentId(); const storeName = getCurrentStore();
+    
+    // 修正拦截逻辑：只有当标识符完全为空，或者文本框里连一个字底稿都没有时，才判定为空白拦截
+    if (!id || !sourceIn.value.trim()) return;
+    
+    if (confirm(`确定删除《${title}》底稿吗？`) && confirm(`最后确认彻底删除？`)) {
+        for (let i = 1; i < 99999; i++) window.clearTimeout(i);
+        try {
+            if (!db) db = await openDB();
+            const transaction = db.transaction([storeName, STORE_META], "readwrite");
+            transaction.objectStore(storeName).delete(id);
+            transaction.objectStore(STORE_META).delete(getActiveMetaKey());
+            
+            transaction.oncomplete = async () => {
+                // 🌟【核心修复点 A】物理化除的同时，强行把屏幕上的精进遍数重置归零！
+                const runEl = document.getElementById('total-run');
+                if (runEl) {
+                    runEl.innerText = "0";
+                }
+
+                // 🌟【核心修复点 B】强行把左侧竖排品名签栏洗净，回归初始庄严状态
+                if (bookmarkDisplay) {
+                    bookmarkDisplay.innerText = "(品名)";
+                }
+                
+                // 完全回归清净初始骨架
+                sourceIn.value = ""; 
+                sourceIn.readOnly = false; 
+                baseLy.innerText = ""; 
+                inputLy.innerHTML = ""; 
+                if (titleIn) titleIn.value = ""; 
+                titleDisp.innerText = "深入经藏 智慧如海";
+                oldSutraTitle = "";
+                
+                // 完全解开当前遍数自动追加的锁定状态
+                isCurrentRunCounted = false;
+                
+                // 刷新自选菜单引擎并重新计算零字数
+                await refreshSutraSelector(); 
+                updateCount(); 
+                updateModeDisplay();
+                
+                alert("化除成功");
+            };
+        } catch (e) { alert("化除失败"); }
     }
+}
+
+
 
     async function clearGold() {
         const typedText = inputLy.innerText.replace(/\u200B/g, "");
@@ -1695,7 +1854,8 @@ function showErrorBubble(x, y, currentIndex, totalErrors) {
             });
         }
 
-        const selector = document.getElementById("sutra-selector");
+
+       const selector = document.getElementById("sutra-selector");
         if (selector) {
             selector.addEventListener("change", async function () {
                 if (!this.value) {
@@ -1703,6 +1863,15 @@ function showErrorBubble(x, y, currentIndex, totalErrors) {
                     sourceIn.value = ""; baseLy.innerText = ""; inputLy.innerHTML = ""; titleIn.value = "";
                     bookmarkDisplay.innerText = "(品名)"; document.getElementById("total-run").innerText = "0";
                     sourceIn.readOnly = false; titleIn.readOnly = false;
+                    
+                    // 🌟【核心新增】切换到初始空白自选状态时，同步唤醒确认键，恢复饱满颜色和小手光标
+                    const confirmBtn = document.getElementById('title-confirm-btn');
+                    if (confirmBtn) {
+                        confirmBtn.disabled = false;
+                        confirmBtn.style.opacity = "1";
+                        confirmBtn.style.cursor = "pointer";
+                    }
+
                     const panel = document.getElementById("sync-panel"); if (panel) panel.style.display = "none";
                     isCurrentRunCounted = false;
                     updateTitle(); updateCount(); updateModeDisplay();
@@ -1712,6 +1881,8 @@ function showErrorBubble(x, y, currentIndex, totalErrors) {
                 setTimeout(() => { closeAllDrawers(); }, 100);
             });
         }
+
+
 
         if (sourceIn) {
             sourceIn.addEventListener("paste", function (e) {
@@ -1873,8 +2044,8 @@ function showErrorBubble(x, y, currentIndex, totalErrors) {
     <script src="./sutras.js"></script>
     <script src="./sutras/xj-s.js"></script>
     <script src="./sutras/xj-t.js"></script>
-    <script src="./sutras/fhj-s.js?v=20260603"></script>    
-    <script src="./sutras/fhj-t.js?v=20260603"></script>
+    <script src="./sutras/fhj-s.js"></script>    
+    <script src="./sutras/fhj-t.js"></script>
     <script src="./sutras/bwj-s.js"></script>
     <script src="./sutras/bwj-t.js"></script>
     <script src="./sutras/test-1.js"></script>
