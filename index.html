@@ -1,8 +1,5 @@
 <!DOCTYPE html>
 
-<!-- 🌟 本项目已托管至 GitHub 仓库：https://github.com/dengguanbigeng/shenrujingzang.git -->
-<!-- 💡 提示：每次在此电脑修改代码/经文后，请将此文件夹内的【零散文件】全选上传至上述仓库，Netlify 网站将自动全球无缝热更新 -->
-
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
@@ -57,6 +54,14 @@
     <script src="special-pinyinmb.js?v=20260603"></script>
     
     <style>
+    /* 🌟 核心新增：加载专属微型佛经字库，解决 iPhone 18个缺字方块问题 */
+    @font-face {
+        font-family: 'BuddhismMin';
+        /* 请确保解压出的 icomoon.woff 文件已放入本地项目的 fonts 文件夹中 */
+        src: url('fonts/icomoon.woff') format('woff');
+        font-display: swap;
+    }
+
     :root {
         --char-size: 36px;
         --line-chars: 29;
@@ -150,7 +155,8 @@
         white-space: pre-wrap;
         text-align: left;
         width: var(--paper-width);
-        font-family: "Noto Serif SC", "STKaiti", "KaiTi", "楷体",  serif;
+        /* 🌟 核心优化：在字体回退链条末尾无缝加入 'BuddhismMin' 专用微型字库 */
+        font-family: "Noto Serif SC", "STKaiti", "KaiTi", "楷体", "BuddhismMin", serif;
         letter-spacing: 0.05em;
         word-break: break-all;
         overflow-wrap: anywhere;
@@ -181,7 +187,8 @@
         z-index: 1;
         color: var(--silver);
         width: var(--paper-width) !important;
-        font-family: "Noto Serif SC", "STKaiti", "KaiTi", "楷体",  serif;
+        /* 🌟 核心优化：同步基底层字体链，确保前后双层生僻字完美重合，不发生错位 */
+        font-family: "Noto Serif SC", "STKaiti", "KaiTi", "楷体", "BuddhismMin", serif;
         word-break: break-all !important;
         white-space: pre-wrap !important;
         user-select: text !important;
@@ -230,7 +237,7 @@
 
     #sutra-display-title {
         color: var(--gold);
-        font-family: "Noto Serif SC", "STKaiti", "KaiTi", "楷体",  serif;
+        font-family: "Noto Serif SC", "STKaiti", "KaiTi", "楷体", serif;
         font-size: 45px;
         margin: 50px 0;
         letter-spacing: 0.12em;
@@ -851,7 +858,7 @@ async function handleTitleConfirm() {
         }
     }
 
-    // 同步刷新左侧大标题和黄色品名签
+    // 同步刷新左侧大标题 and 黄色品名签
     updateTitle();
     if (bookmarkDisplay) {
         bookmarkDisplay.innerText = newTitle;
@@ -905,7 +912,7 @@ async function refreshSutraSelector() {
 
 
 
-  async function loadSutraById(id) {
+   async function loadSutraById(id) {
         currentRoom = "custom"; currentSutraKey = ""; updateModeDisplay();
         const item = await getRecord(STORE_CUSTOM, id);
         if (!item) return;
@@ -1098,6 +1105,7 @@ function updateModeDisplay() {
         save(); 
     }
 
+    // 英文中的 1000 保持 1,000 写法，此功能此处不涉及变动
     function lockSource() { 
         if (!sourceIn.value.trim()) return; 
         baseLy.innerText = cleanTextForMobile(sourceIn.value);
@@ -1407,7 +1415,7 @@ function showErrorBubble(x, y, currentIndex, totalErrors) {
             </button>
         `;
 
-        // 🌟 根据错字数量，动态拼装按钮布局（皆在右侧并排，【一键修正】在【下一处】或【知道了】前面）
+        // 🌟 根据错字数量，动态拼装按钮布局
         if (totalErrors > 1) {
             extraNotice = `<div style="font-size:12px; font-weight:normal; color:#e74c3c; margin-top:5px; text-align:center;">
                 💡 除此处外，还有 <b style="color:#e74c3c;">${extraCount}</b> 处错字。
@@ -1457,7 +1465,6 @@ function showErrorBubble(x, y, currentIndex, totalErrors) {
         bubble.style.pointerEvents = "auto"; 
 
         bubble.style.left = x + "px";
-        // 适当增加了气泡高度的偏移量（yOffset），防止底部按钮变多后向下遮挡经文
         const yOffset = totalErrors > 1 ? 142 : 122; 
         bubble.style.top = (y + window.pageYOffset - yOffset) + "px"; 
         bubble.style.transform = "translateX(-50%)";
@@ -1613,12 +1620,11 @@ function showErrorBubble(x, y, currentIndex, totalErrors) {
 
 
 
-    // 🌟 彻底重塑物理化除底稿函数（全面规整版：完美清洗品名、遍数、防止死锁残留）
+    // 🌟 彻底重塑物理化除底稿函数
 async function clearBase() {
     if (currentRoom === "builtin") { alert("系统内置经典不能物理化除。"); return; }
     const title = getCurrentTitle(); const id = getCurrentId(); const storeName = getCurrentStore();
     
-    // 修正拦截逻辑：只有当标识符完全为空，或者文本框里连一个字底稿都没有时，才判定为空白拦截
     if (!id || !sourceIn.value.trim()) return;
     
     if (confirm(`确定删除《${title}》底稿吗？`) && confirm(`最后确认彻底删除？`)) {
@@ -1630,18 +1636,17 @@ async function clearBase() {
             transaction.objectStore(STORE_META).delete(getActiveMetaKey());
             
             transaction.oncomplete = async () => {
-                // 🌟【核心修复点 A】物理化除的同时，强行把屏幕上的精进遍数重置归零！
+                // 物理化除的同时，强行把屏幕上的精进遍数重置归零
                 const runEl = document.getElementById('total-run');
                 if (runEl) {
                     runEl.innerText = "0";
                 }
 
-                // 🌟【核心修复点 B】强行把左侧竖排品名签栏洗净，回归初始庄严状态
+                // 强行把左侧竖排品名签栏洗净，回归初始状态
                 if (bookmarkDisplay) {
                     bookmarkDisplay.innerText = "(品名)";
                 }
                 
-                // 完全回归清净初始骨架
                 sourceIn.value = ""; 
                 sourceIn.readOnly = false; 
                 baseLy.innerText = ""; 
@@ -1650,10 +1655,8 @@ async function clearBase() {
                 titleDisp.innerText = "深入经藏 智慧如海";
                 oldSutraTitle = "";
                 
-                // 完全解开当前遍数自动追加的锁定状态
                 isCurrentRunCounted = false;
                 
-                // 刷新自选菜单引擎并重新计算零字数
                 await refreshSutraSelector(); 
                 updateCount(); 
                 updateModeDisplay();
@@ -1682,7 +1685,7 @@ async function clearBase() {
             if (!isCurrentRunCounted) {
                 if (baseCount > 0 && remainingChars <= 130) {
                     if (runEl) { runEl.innerText = (parseInt(runEl.innerText) || 0) + 1; }
-                    alert("✨ 功功德圆满！检测到剩余未抄字数小于130字，已为您计入 1 遍。");
+                    alert("✨ 功德圆满！检测到剩余未抄字数小于130字，已为您计入 1 遍。");
                 } else {
                     alert("进度已抹去。由于剩余未抄字数多于130字，本次不计入遍数，望下次一气呵成。");
                 }
@@ -1864,7 +1867,6 @@ async function clearBase() {
                     bookmarkDisplay.innerText = "(品名)"; document.getElementById("total-run").innerText = "0";
                     sourceIn.readOnly = false; titleIn.readOnly = false;
                     
-                    // 🌟【核心新增】切换到初始空白自选状态时，同步唤醒确认键，恢复饱满颜色和小手光标
                     const confirmBtn = document.getElementById('title-confirm-btn');
                     if (confirmBtn) {
                         confirmBtn.disabled = false;
