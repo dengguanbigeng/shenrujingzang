@@ -464,35 +464,52 @@
         }
 
 
-          /* 找到 @media screen and (max-width: 1024px) 内部的这两个部分并替换 */
-        #pinyin-float-panel {
-            position: fixed;
-            right: 0;
-            top: 50px;
-            transform: translate3d(100%, 0, 0);
-            -webkit-transform: translate3d(100%, 0, 0);
-            width: 280px;
-            height: calc(100dvh - 50px); /* 使用 100dvh 完美适配手机动态视口 */
-            border-radius: 0;
-            border: none;
-            border-left: 2px solid var(--gold);
-            z-index: 1500;
-            /* 🌟 核心新增：当屏幕装不下时，允许整个面板局部上下滚动 */
-            overflow-y: auto !important;
-            padding-bottom: env(safe-area-inset-bottom, 20px) !important; /* 留出底部全面屏安全距离 */
-            box-sizing: border-box;
-        }
-        #pinyin-float-panel.active { 
-            transform: translate3d(0, 0, 0); 
-            -webkit-transform: translate3d(0, 0, 0); 
-        }
-        
-        /* 🌟 核心新增：在小屏幕上，把文本框的最小高度调小，并让它高度适中 */
-        #sutra-preview {
-            min-height: 100px !important; 
-            height: 18vh !important; /* 动态占用屏幕高度的 18%，给下方拼音腾出地方 */
-        }
+  /* 🌟 精准校准版：请将这整段直接替换到 @media screen and (max-width: 1024px) 内部 */
+    
+    #pinyin-float-panel {
+        position: fixed;
+        right: 0;
+        top: 50px;
+        transform: translate3d(100%, 0, 0);
+        -webkit-transform: translate3d(100%, 0, 0);
+        width: 280px;
+        height: calc(100dvh - 50px); /* 使用 100dvh 完美适配手机动态视口 */
+        border-radius: 0;
+        border: none;
+        border-left: 2px solid var(--gold);
+        z-index: 1500;
+        /* 🌟 核心优化：允许侧边栏局部上下滚动，防止被输入法或小屏幕挤爆 */
+        overflow-y: auto !important;
+        padding-bottom: env(safe-area-inset-bottom, 20px) !important; /* 留出底部全面屏安全距离 */
+        box-sizing: border-box;
+    }
 
+    #pinyin-float-panel.active { 
+        transform: translate3d(0, 0, 0); 
+        -webkit-transform: translate3d(0, 0, 0); 
+    }
+
+    /* 🌟 新增：在手机端将自选经文预览框压缩，给拼音空出空间 */
+    #sutra-preview {
+        min-height: 100px !important; 
+        height: 18vh !important; /* 动态占用屏幕高度的 18%，防止把下方拼音挤出屏幕 */
+    }
+
+    /* 🌟 核心新增：同步为手机侧边栏的拼音显示区加入微型字库，全面消除方块 */
+    #py-display {
+        font-size: 28px;
+        color: var(--accent);
+        font-weight: bold;
+        min-height: 34px;
+        margin: 5px 0;
+        font-family: "STKaiti", "KaiTi", "BuddhismMin", serif;
+    }
+         
+    #py-char {
+        font-size: 24px;
+        color: #666;
+        font-family: "STKaiti", "KaiTi", "楷体", "BuddhismMin", serif; /* 彻底纠正拼音汉字小方块 */
+    }
 
 
 
