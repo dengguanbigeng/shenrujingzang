@@ -9,18 +9,10 @@
     <link rel="icon" type="image/png" href="favicon.png">
 
     <script>
-        (function() {
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const day = String(now.getDate()).padStart(2, '0');
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            
-            // 自动生成形如 202606031235 的纯数字版本号
-            window.DGBJ_VERSION = `${year}${month}${day}${hours}${minutes}`;
-        })();
+        window.DGBJ_VERSION = "202606041438";
     </script>
+
+    
 
     <script>
     (function() {
@@ -51,7 +43,7 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-screen-webfont@1.1.0/style.css" />
     <script src="https://unpkg.com/pinyin-pro" onerror="this.onerror=null; document.write('<script src=\'pinyin-pro.js\'><\/script>')"></script>
-    <script src="special-pinyinmb.js?v=20260603"></script>
+    <script src="special-pinyinmb.js"></script>
     
     <style>
     /* 🌟 核心新增：加载专属微型佛经字库，解决 iPhone 18个缺字方块问题 */
@@ -1775,10 +1767,16 @@ async function clearBase() {
     async function loadSutra(key) {
         const item = window.SUTRA_REGISTRY ? window.SUTRA_REGISTRY[key] : null; if (!item) return;
         currentRoom = "builtin"; currentSutraKey = key; updateModeDisplay();
+        
         const saved = await getRecord(STORE_BUILTIN, key);
+        
         if (saved) {
-            titleIn.value = saved.title || item.title; sourceIn.value = saved.base || item.content;
-            baseLy.innerText = saved.base || item.content; inputLy.innerText = saved.typed || "";
+
+        // 标题永远采用最新经文定义
+         titleIn.value = item.title;
+         sourceIn.value = item.content;
+
+            baseLy.innerText = item.content; inputLy.innerText = saved.typed || "";
             bookmarkDisplay.innerText = saved.pinnedChap || "(品名)"; document.getElementById('total-run').innerText = saved.totalRun || 0;
             isCurrentRunCounted = (saved.isCurrentRunCounted === undefined || saved.isCurrentRunCounted === null) ? false : saved.isCurrentRunCounted;
         } else {
@@ -2074,7 +2072,7 @@ async function clearBase() {
 
     <script>
         // 动态读取最顶部的 window.DGBJ_VERSION 变量，开屏瞬间无感印刷，让样式完美闭环
-        document.getElementById("dynamic-title").innerText = "等观笔耕v" + window.DGBJ_VERSION + " 经藏版";
+       document.getElementById("dynamic-title").innerText ="等观笔耕v" + window.DGBJ_VERSION + " 经藏版";
     </script>
 
     <script src="./sutras.js"></script>
