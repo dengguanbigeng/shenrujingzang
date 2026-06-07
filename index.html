@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
@@ -9,10 +8,8 @@
     <link rel="icon" type="image/png" href="favicon.png">
 
     <script>
-        window.DGBJ_VERSION = "202606041636";
+        window.DGBJ_VERSION = "202606072218";
     </script>
-
-    
 
     <script>
     (function() {
@@ -27,7 +24,7 @@
                 });
             }
             console.log("🚀 检测到笔耕新版 v" + CURRENT_VERSION + "，正在自动洗净缓存...");
-            window.location.reload(true); // 只要版本号（时间）变了，这里会安全地强制刷新整页文件
+            window.location.reload(true); 
         }
     })();
     </script>
@@ -40,16 +37,13 @@
         gtag('config', 'G-QGSWBD4P37');
     </script>
 
-
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-screen-webfont@1.1.0/style.css" />
     <script src="https://unpkg.com/pinyin-pro" onerror="this.onerror=null; document.write('<script src=\'pinyin-pro.js\'><\/script>')"></script>
     <script src="special-pinyinmb.js"></script>
     
     <style>
-    /* 🌟 核心新增：加载专属微型佛经字库，解决 iPhone 18个缺字方块问题 */
     @font-face {
         font-family: 'BuddhismMin';
-        /* 请确保解压出的 icomoon.woff 文件已放入本地项目的 fonts 文件夹中 */
         src: url('fonts/icomoon.woff') format('woff');
         font-display: swap;
     }
@@ -147,7 +141,6 @@
         white-space: pre-wrap;
         text-align: left;
         width: var(--paper-width);
-        /* 🌟 核心优化：在字体回退链条末尾无缝加入 'BuddhismMin' 专用微型字库 */
         font-family: "Noto Serif SC", "STKaiti", "KaiTi", "楷体", "BuddhismMin", serif;
         letter-spacing: 0.05em;
         word-break: break-all;
@@ -166,7 +159,7 @@
         z-index: 2;
         outline: none;
         caret-color: #ffea00;
-        display: inline;                                    
+        display: inline;                                                    
         white-space: pre-wrap;
         pointer-events: auto;
         min-height: 1.8em;
@@ -179,7 +172,6 @@
         z-index: 1;
         color: var(--silver);
         width: var(--paper-width) !important;
-        /* 🌟 核心优化：同步基底层字体链，确保前后双层生僻字完美重合，不发生错位 */
         font-family: "Noto Serif SC", "STKaiti", "KaiTi", "楷体", "BuddhismMin", serif;
         word-break: break-all !important;
         white-space: pre-wrap !important;
@@ -228,7 +220,7 @@
     }
 
     #sutra-display-title {
-        color: var(--gold);
+        color: #ffd080; /* ✨ 已同步为您修正为高雅的淡橘黄色 */
         font-family: "Noto Serif SC", "STKaiti", "KaiTi", "楷体", serif;
         font-size: 45px;
         margin: 50px 0;
@@ -306,7 +298,7 @@
         background: var(--bg-color);
         border: 2px solid var(--gold);
         border-radius: 15px;
-        color: var(--gold);
+        color: #ffe0a0;
         font-size: 26px;
         display: flex;
         align-items: center;
@@ -412,6 +404,22 @@
 
     .wenshu-sign { height: 34px; width: 180px; margin-top: -6px; margin-bottom: 8px; opacity: 0.88; }
 
+    .ui-toggle-btn {
+        background: var(--primary);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 2px 10px;
+        font-size: 11px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-weight: normal;
+        transition: 0.2s;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .ui-toggle-btn:hover {
+        background: var(--accent);
+    }
+
     @media screen and (max-width: 1024px) {
         .app-container {
             grid-template-columns: 1fr;
@@ -454,63 +462,48 @@
         #controls::-webkit-scrollbar-track {
             background: transparent !important;
         }
-
-
-  /* 🌟 精准校准版：请将这整段直接替换到 @media screen and (max-width: 1024px) 内部 */
-    
-    #pinyin-float-panel {
-        position: fixed;
-        right: 0;
-        top: 50px;
-        transform: translate3d(100%, 0, 0);
-        -webkit-transform: translate3d(100%, 0, 0);
-        width: 280px;
-        height: calc(100dvh - 50px); /* 使用 100dvh 完美适配手机动态视口 */
-        border-radius: 0;
-        border: none;
-        border-left: 2px solid var(--gold);
-        z-index: 1500;
-        /* 🌟 核心优化：允许侧边栏局部上下滚动，防止被输入法或小屏幕挤爆 */
-        overflow-y: auto !important;
-        padding-bottom: env(safe-area-inset-bottom, 20px) !important; /* 留出底部全面屏安全距离 */
-        box-sizing: border-box;
-    }
-
-    #pinyin-float-panel.active { 
-        transform: translate3d(0, 0, 0); 
-        -webkit-transform: translate3d(0, 0, 0); 
-    }
-
-    /* 🌟 新增：在手机端将自选经文预览框压缩，给拼音空出空间 */
-    #sutra-preview {
-        min-height: 100px !important; 
-        height: 18vh !important; /* 动态占用屏幕高度的 18%，防止把下方拼音挤出屏幕 */
-    }
-
-    /* 🌟 核心新增：同步为手机侧边栏的拼音显示区加入微型字库，全面消除方块 */
-    #py-display {
-        font-size: 28px;
-        color: var(--accent);
-        font-weight: bold;
-        min-height: 34px;
-        margin: 5px 0;
-        font-family: "STKaiti", "KaiTi", "BuddhismMin", serif;
-    }
-         
-    #py-char {
-        font-size: 24px;
-        color: #666;
-        font-family: "STKaiti", "KaiTi", "楷体", "BuddhismMin", serif; /* 彻底纠正拼音汉字小方块 */
-
-        /* 🌟 核心新增：通过四维微米级阴影强行全方位加粗文字 */
-        text-shadow: 
-            1px 0px 0px #666, 
-           -1px 0px 0px #666, 
-            0px 1px 0px #666, 
-            0px -1px 0px #666;
-
+        
+        #pinyin-float-panel {
+            position: fixed;
+            right: 0;
+            top: 50px;
+            transform: translate3d(100%, 0, 0);
+            -webkit-transform: translate3d(100%, 0, 0);
+            width: 280px;
+            height: calc(100dvh - 50px);
+            border-radius: 0;
+            border: none;
+            border-left: 2px solid var(--gold);
+            z-index: 1500;
+            overflow-y: auto !important;
+            padding-bottom: env(safe-area-inset-bottom, 20px) !important;
+            box-sizing: border-box;
         }
 
+        #pinyin-float-panel.active { 
+            transform: translate3d(0, 0, 0); 
+            -webkit-transform: translate3d(0, 0, 0); 
+        }
+
+        #sutra-preview {
+            min-height: 100px !important; 
+            height: 18vh !important;
+        }
+
+        #py-display {
+            font-size: 28px;
+            color: var(--accent);
+            font-weight: bold;
+            min-height: 34px;
+            margin: 5px 0;
+            font-family: "STKaiti", "KaiTi", "BuddhismMin", serif;
+        }
+             
+        #py-char {
+            font-size: 24px;
+            color: #666;
+            font-family: "STKaiti", "KaiTi", "楷体", "BuddhismMin", serif;
+        }
 
         .drawer-mask {
             display: none;
@@ -575,6 +568,17 @@
     }
 
     #error-bubble { animation: bubbleFadeIn 0.25s ease-out forwards; }
+    @media screen and (max-width: 1024px) {
+        .mobile-header .ui-toggle-btn {
+            order: 2;
+            margin-left: auto;
+            margin-right: 10px;
+            padding: 4px 12px;
+        }
+        .mobile-header h1 {
+            order: 3;
+        }
+    }
     @keyframes bubbleFadeIn {
         from { opacity: 0; transform: translate(-50%, 8px); }
         to { opacity: 1; transform: translate(-50%, 0); }
@@ -598,12 +602,12 @@
 
     <div class="mobile-header">
         <button onclick="toggleDrawer('controls')">🛠️ 系统工具</button>
+        <button id="ui-trad-toggle-mobile" class="ui-toggle-btn" onclick="toggleUIVersion(event)">繁体版面</button>
         <h1>等观笔耕 经藏版</h1>
         <button onclick="toggleDrawer('pinyin-float-panel')">📚 阅藏摄取</button>
     </div>
 
     <div class="drawer-mask" id="drawer-mask" onclick="closeAllDrawers()"></div>
-
 
 <div class="app-container">
         
@@ -613,48 +617,46 @@
                 <img src="./images/wenshu-sign.png" class="wenshu-sign" alt="伦敦文殊精舍" style="margin: 0 !important; max-width: 100%;">
             </div>
 
-          
-          <div class="section-title">经文标题</div>
+          <div id="ui-lbl-title" class="section-title">经文标题</div>
 <div style="display: flex; gap: 6px; margin-bottom: 6px;">
     <input type="text" id="title-input" placeholder="请输入经名..." autocomplete="off" style="flex-grow: 1; margin: 0; padding: 6px 8px; height: 30px; box-sizing: border-box;">
     <button id="title-confirm-btn" onclick="handleTitleConfirm()" disabled style="background: var(--primary); padding: 0 12px; border-radius: 6px; font-size: 12px; flex-shrink: 0; height: 30px; line-height: 30px; border: none; color: #fff; opacity: 0.5; cursor: not-allowed;">确认</button>
 </div>
             
-           
             <div class="source-wrapper">
                 <textarea id="source-input" oninput="syncText()" style="position: absolute; left: -9999px; top: -9999px; width: 1px; height: 1px; opacity: 0; pointer-events: none;" placeholder="在此粘贴经文原文作为底稿..." autocomplete="off"></textarea>
 
                 <div id="sync-panel" class="sync-overlay">
-                    <div style="font-size: 13px; color: var(--accent); margin-bottom: 5px; font-weight: bold;">📜 抄经进度同步（金色字）</div>
+                    <div id="ui-lbl-sync-head" style="font-size: 13px; color: var(--accent); margin-bottom: 5px; font-weight: bold;">📜 抄经进度同步（金色字）</div>
                     <textarea id="sync-input" style="height:100px;" placeholder="在此粘贴需要补录经典的片段..." autocomplete="off"></textarea>
-                    <button style="background: var(--primary); padding: 8px; font-size: 13px; margin-top: 4px; width: 100%;" onclick="applySync(); closeAllDrawers();">✅ 确认补录并同步进度</button>
-                    <button onclick="showHelp()" style="background:#2d6f7b; padding: 8px; font-size:13px; margin-top:6px; width: 100%;">📘 使用帮助</button>
+                    <button id="ui-btn-sync-submit" style="background: var(--primary); padding: 8px; font-size: 13px; margin-top: 4px; width: 100%; font-weight: normal;" onclick="applySync(); closeAllDrawers();">确认补录并同步进度</button>
+                    <button id="ui-btn-help-trigger" onclick="showHelp()" style="background:#2d6f7b; padding: 8px; font-size:13px; margin-top:6px; width: 100%; font-weight: normal;">使用帮助</button>
                 </div>
             </div>
 
-            <div style="font-size:11px; color:#999; margin-bottom:12px; margin-top: 2px;">系统经藏当前以大正藏文本为准</div>
+            <div id="ui-lbl-canon-tip" style="font-size:11px; color:#999; margin-bottom:12px; margin-top: 2px;">系统经藏当前以大正藏文本为准</div>
 
             <div id="admin-wrapper" style="margin-top: 2px;">
                  <div id="total-count-box" style="background:#2a6372; color:#FFF9C4; font-size:13px; margin:5px 0; display:flex; align-items:center; justify-content:center; border-radius:20px; padding:0px; border:1px solid var(--gold); position:relative; z-index:50; min-height:32px; flex-shrink:0;">
-                    <span>本经已精进：<b id="total-run" style="font-size: 17px; margin: 0 4px;">0</b> 遍</span>
+                    <span id="ui-lbl-精进-box">本经已精进：<b id="total-run" style="font-size: 17px; margin: 0 4px;">0</b> 遍</span>
                     <button class="admin-only" onclick="resetRunCount()" style="position: absolute; right: 8px; background: rgba(231, 76, 60, 0.8); color: white; border: none; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; display: flex; align-items: center; justify-content: center;">×</button>
                 </div>
 
-                <div class="section-title" onclick="togglePanel('admin-box')">🛠️ 系统工具 ▼</div>
+                <div id="ui-lbl-sys-tools" class="section-title" onclick="togglePanel('admin-box')">系统工具 ▼</div>
                 <div id="admin-box" style="display:none; flex-direction:column; gap:5px; background: white; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
-                    <button style="background:#2e8b57;" onclick="exportTxt()">💾 导出当前录入成果 (TXT)</button>
-                    <button style="background:#8e44ad;" onclick="exportBackup()">📦 导出完整备份</button>
-                    <button style="background:#16a085;" onclick="importBackup()"><input type="file" id="backupFile" style="display:none" onchange="handleImport(event)">📥 导入完整备份</button>
-                    <button style="background:#3498db;" onclick="resetInterface(); closeAllDrawers();">🧹 清净界面 · 准备新录</button>
-                    <button style="background:#7f8c8d; border: 1px solid #ff4d4d;" onclick="clearBase(); closeAllDrawers();">⚪ 物理化除底稿 (慎点)</button>
-                    <button style="background:#d38934;" onclick="clearGold(); closeAllDrawers();">✨ 抹去进度 · 再抄一遍</button>
+                    <button id="ui-btn-exp-txt" style="background:#2e8b57; font-weight: normal;" onclick="exportTxt()">导出当前录入成果 (TXT)</button>
+                    <button id="ui-btn-exp-bak" style="background:#8e44ad; font-weight: normal;" onclick="exportBackup()">导出完整备份</button>
+                    <button id="ui-btn-imp-bak" style="background:#16a085; font-weight: normal;" onclick="importBackup()"><input type="file" id="backupFile" style="display:none" onchange="handleImport(event)">导入完整备份</button>
+                    <button id="ui-btn-clean-ui" style="background:#3498db; font-weight: normal;" onclick="resetInterface(); closeAllDrawers();">清净界面 · 准备新录</button>
+                    <button id="ui-btn-clear-base" style="background:#7f8c8d; border: 1px solid #ff4d4d; font-weight: normal;" onclick="clearBase(); closeAllDrawers();">物理化除底稿 (慎点)</button>
+                    <button id="ui-btn-clear-gold" style="background:#d38934; font-weight: normal;" onclick="clearGold(); closeAllDrawers();">✨ 抹去进度 · 再抄一遍</button>
                 </div>
             </div>
 
             <div id="stats-footer" style="margin-top: auto; padding: 10px; background: rgba(240,240,240,0.96); border-radius: 12px; border: 1px dotted #ccc; color: #666; font-size: 13px;">
                 <div style="display:flex; justify-content:space-between;">
-                    <div>底稿：<b id="base-count" style="color:#2d6f7b;">0</b></div>
-                    <div>抄经：<b id="char-count" style="color:#d38934;">0</b></div>
+                    <div id="ui-lbl-stat-base">底稿：<b id="base-count" style="color:#2d6f7b;">0</b></div>
+                    <div id="ui-lbl-stat-typed">抄经：<b id="char-count" style="color:#d38934;">0</b></div>
                 </div>
             </div>
         </div> 
@@ -675,8 +677,23 @@
         </div>
 
         <div id="pinyin-float-panel">
-            <div style="font-size: 16px; color: var(--primary); font-weight: bold; margin-bottom: 12px;">📜 阅藏与摄取</div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; width: 100%;">
+                <div id="ui-lbl-panel-main" style="font-size: 16px; color: var(--primary); font-weight: bold;">阅藏与摄取</div>
+                <button id="ui-trad-toggle-desktop" class="ui-toggle-btn" onclick="toggleUIVersion(event)">繁体版面</button>
+            </div>
             <div id="current-mode" class="mode-badge">当前模式：📚 系统经藏</div>
+
+             <div style="width: 100%; margin-bottom: 6px; background: rgba(45, 111, 123, 0.05); padding: 5px 8px; border-radius: 10px; border: 1px dashed var(--primary); box-sizing: border-box;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 3px;">
+        <div style="font-size: 12px; color: var(--primary); font-weight: bold;">🔍 底稿文字检索</div>
+        <span id="search-position-info" style="color:#7f8c8d; font-size:11px;"></span>
+    </div>
+    <div style="display: flex; gap: 4px; margin-bottom: 2px;">
+        <input type="text" id="sutra-search-input" oninput="searchInCurrentSutraData()" placeholder="输入字句，即搜即得..." autocomplete="off" style="flex-grow: 1; margin: 0; padding: 4px 6px; height: 26px; font-size: 12px; box-sizing: border-box;">
+        <button onclick="clearBaseSearchHighlights();" style="background: #95a5a6; padding: 0 8px; border-radius: 4px; font-size: 11px; height: 26px; line-height: 26px; border: none; color: #fff; cursor: pointer; font-weight: normal; flex-shrink: 0;">清空</button>
+    </div>
+    <div id="sutra-search-msg" style="box-sizing: border-box;"></div>
+</div>
 
             <div style="width: 100%; margin-bottom: 12px;">
                 <select id="sutra-select" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--gold); font-size: 12px;"></select>
@@ -685,7 +702,7 @@
             <div style="display: flex; flex-direction: column; width: 100%; flex-grow: 1;">
                 <div style="width: 100%; margin-bottom: 8px;">
                     <select id="sutra-selector" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--gold); font-size: 12px;">
-                        <option value="">--- 自选经典目录 ---</option>
+                        <option id="ui-opt-custom-dir" value="">--- 自选经典目录 ---</option>
                     </select>
                 </div>
 
@@ -694,22 +711,22 @@
                 </div>
                 
                 <div style="width: 100%; margin-bottom: 12px;">
-                    <button onclick="clearPreview()" style="width: 100%; background: #fdfdfd; color: #c0c0c0; border: 1px solid #ddd; border-radius: 20px; padding: 6px 0; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-family: 'STKaiti', 'KaiTi', serif; box-sizing: border-box;">
+                    <button onclick="clearPreview()" style="width: 100%; background: #fdfdfd; color: #c0c0c0; border: 1px solid #ddd; border-radius: 20px; padding: 6px 0; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-family: 'STKaiti', 'KaiTi', serif; box-sizing: border-box; font-weight: normal;">
                         <div style="width: 12px; height: 12px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #ffffff 0%, #e8e2f7 40%, #c8b8e8 100%); box-shadow: 0 0 5px rgba(200, 184, 232, 0.6);"></div>
-                        <span>空即是色 · 清空</span>
+                        <span id="ui-lbl-clear-pre-btn">空即是色 · 清空</span>
                     </button>
                 </div>
 
-                <button onclick="importFromPreview(this); closeAllDrawers();" class="side-main-btn orange-btn" style="background: #b8860b; margin-bottom: 8px;">📥 摄取上方内容为底稿</button>
-                <button onclick="manualSave(); closeAllDrawers();" class="side-main-btn green-btn" style="margin-bottom: 8px;">💾 手动保存当前进度</button>
+                <button id="ui-btn-import-pre" onclick="importFromPreview(this); closeAllDrawers();" class="side-main-btn orange-btn" style="background: #b8860b; margin-bottom: 8px; font-weight: normal;">📥 摄取上方内容为底稿</button>
+                <button id="ui-btn-manual-save" onclick="manualSave(); closeAllDrawers();" class="side-main-btn green-btn" style="margin-bottom: 8px; font-weight: normal;">💾 手动保存当前进度</button>
             </div>
 
             <hr style="border: 0; border-top: 1px solid #eee; margin: 5px 0;">
 
             <div style="flex-shrink: 0;">
-                <div style="font-size: 14px; color: var(--primary); margin-bottom: 8px; font-weight: bold;">• 般若音感 •</div>
-                <button onclick="togglePinyinMode(event)" class="side-main-btn" style="background:linear-gradient(135deg, #c084fc, #9333ea);">🔤 拼音/注音</button>
-                <button id="check-btn" onclick="toggleCheckMode(); closeAllDrawers();" class="side-main-btn check-btn" style="margin-bottom: 5px;">🔍 开启校验</button>
+                <div id="ui-lbl-pinyin-title" style="font-size: 14px; color: var(--primary); margin-bottom: 8px; font-weight: bold;">• 般若音感 •</div>
+                <button id="ui-btn-pinyin-toggle" onclick="togglePinyinMode(event)" class="side-main-btn" style="background:linear-gradient(135deg, #c084fc, #9333ea); font-weight: normal;">🔤 拼音/注音</button>
+                <button id="check-btn" onclick="toggleCheckMode(); closeAllDrawers();" class="side-main-btn check-btn" style="margin-bottom: 5px; font-weight: normal;">🔍 开启校验</button>
                 <div id="error-warning" style="display: none; color: #ff4d4d; font-size: 12px; margin-top: 2px;">⚠️ 录入有误</div>
                 <div id="py-display" style="font-size: 28px; color: var(--accent); font-weight: bold; min-height: 34px; margin: 5px 0;">-</div>
                 <div id="py-char" style="font-size: 24px; color: #666;">拼音参考</div>
@@ -720,11 +737,11 @@
     <div id="help-modal" class="help-modal-mask" onclick="hideHelp()">
         <div class="help-modal-box" onclick="event.stopPropagation()">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                <h3 style="margin:0;">📘 等观笔耕 · 使用步骤</h3>
-                <button id="help-trad-toggle" style="background:#2d6f7b; padding:5px 12px; border-radius:15px; font-size:12px;">简体</button>
+                <h3 id="ui-lbl-help-modal-title" style="margin:0; font-weight: normal;">📘 等观笔耕 · 使用步骤</h3>
+                <button id="help-trad-toggle" style="background:#2d6f7b; padding:5px 12px; border-radius:15px; font-size:12px; font-weight: normal;">简体</button>
             </div>
             <div id="help-content">
-                <p>一、抄经 platform 分成系统抄经与自选抄经两个系统。从右侧“系统经藏”下的下拉菜单中选择经典可直接进入屏幕抄经。</p>
+                <p>一、点击屏幕中金黄色文字即可输入文字开始抄经，每到行尾回车换行。抄经平台分成系统抄经与自选抄经两个系统。从右侧“系统经藏”下的下拉菜单中选择经典可直接进入屏幕抄经。</p>
                 <p>二、如果要自选抄经，应先将所要抄写经文粘贴 to 右侧框中，然后点击“摄取上方内容为底稿”，屏幕中会生成银色底稿，即可进行自选抄经。</p>
                 <p>三、在中间金色文字层开始抄写，系统自动保存。</p>
                 <p>四、可点击“开启校验”检查正误。输入错别字代替某疑难字然后按此按钮即可。</p>
@@ -736,7 +753,7 @@
                 <p>十、选中屏幕中的文字，在右下角会呈现拼音字符。拼音示例：标准音/咒语发音参考，誐：e/ga ye。</p>
                 <p>十一、抄经 platform 上的按钮及文字栏目，可以随意点击，不要担心出错，这样的灵活设置就是为了让初次使用者能够迅速熟识抄经系统的步骤。</p>
             </div>
-            <button onclick="hideHelp()" style="background:#2d6f7b; width:100%; margin-top:12px;">我知道了</button>
+            <button id="ui-btn-help-close" onclick="hideHelp()" style="background:#2d6f7b; width:100%; margin-top:12px; font-weight: normal;">我知道了</button>
         </div>
     </div>
 
@@ -767,7 +784,228 @@
 
     let isCurrentRunCounted = false;
 
-    // 🌟 移动端侧边抽屉开关工具扩展
+    let currentUIVersion = localStorage.getItem("DGBJ_UI_LANG_VERSION") || "hans";
+    
+    const uiVersionDict = {
+    hans: {
+        switchBtnText: "繁体版面",
+        mainPanelTitle: "阅藏与摄取",
+        currentModeLabel: "当前模式：",  
+        appMainTitle: "等观笔耕v" ,       
+        customDirOpt: "--- 自选经典目录 ---",
+        clearPreBtn: "空即是色 · 清空",
+        importPreBtn: "📥 摄取上方内容为底稿",
+        manualSaveBtn: "💾 手动保存当前进度",
+        pinyinBoxTitle: "• 般若音感 •",
+        pinyinToggleBtn: "🔤 拼音/注音",
+        checkBtnNormal: "🔍 开启校验",
+        checkBtnActive: "🔍 校验中...",
+        checkBtnError: "⚠️ 录入有误",
+        errorWarningTip: "⚠️ 录入有误",
+        pinyinCharTip: "拼音参考",
+        sutraTitleLabel: "经文标题",
+        syncHeadLabel: "📜 抄经进度同步（金色字）",
+        syncSubmitBtn: "确认补录并同步进度",
+        helpTriggerBtn: "使用帮助",
+        canonTipText: "系统经藏当前以大正藏文本为准",
+        runCountLabelPrefix: "本经已精进：",
+        runCountLabelSuffix: " 遍",
+        sysToolsHeader: "系统工具 ▼",
+        expTxtBtn: "导出当前录入成果 (TXT)",
+        expBakBtn: "导出完整备份",
+        impBakBtn: "导入完整备份",
+        cleanUiBtn: "清净界面 · 准备新录",
+        clearBaseBtn: "⚪ 物理化除底稿 (慎点)",
+        clearGoldBtn: "✨ 抹去进度 · 再抄一遍",
+        statBaseLabel: "底稿：",
+        statTypedLabel: "抄经：",
+        helpModalTitle: "📘 等观笔耕 · 使用步骤",
+        helpModalClose: "我知道了",
+        appSubTitle: " 经藏版",
+        titleInPlaceholder: "请输入经名...",
+        syncInPlaceholder: "在此粘贴需要补录经典的片段...",
+        previewPlaceholder: "在此粘贴自选经典...",
+        titleConfirmBtnText: "确认",
+        modeBuiltin: "系统经藏",
+        modeCustom: "自选经藏"
+    },
+    hant: {
+        switchBtnText: "简体版面",
+        mainPanelTitle: "閱藏與攝取",
+        currentModeLabel: "當前模式：",  
+        customDirOpt: "--- 自選經典目錄 ---",
+        clearPreBtn: "空即是色 · 清空",
+        importPreBtn: "📥 職取上方內容為底稿",
+        manualSaveBtn: "💾 手動保存當前進度",
+        pinyinBoxTitle: "• 般若音感 •",
+        pinyinToggleBtn: "🔤 拼音/註音",
+        checkBtnNormal: "🔍 開啟校驗",
+        checkBtnActive: "🔍 校驗中...",
+        checkBtnError: "⚠️ 錄入有誤",
+        errorWarningTip: "⚠️ 錄入有誤",
+        pinyinCharTip: "拼音參考",
+        appMainTitle: "等觀筆耕v" ,       
+        sutraTitleLabel: "經文標題",
+        syncHeadLabel: "📜 抄經進度同步（金色字）",
+        syncSubmitBtn: "確認補錄並同步進度",
+        helpTriggerBtn: "使用幫助",
+        canonTipText: "系統經藏當前以大正藏文本為準",
+        runCountLabelPrefix: "本經已精進：",
+        runCountLabelSuffix: " 遍",
+        sysToolsHeader: "系統工具 ▼",
+        expTxtBtn: "導出當前錄入成果 (TXT)",
+        expBakBtn: "導出完整備份",
+        impBakBtn: "導入完整備份",
+        cleanUiBtn: "清淨界面 · 準備新錄",
+        clearBaseBtn: "⚪ 物理化除底稿 (慎點)",
+        clearGoldBtn: "✨ 抹去進度 · 再抄一遍",
+        statBaseLabel: "底稿：",
+        statTypedLabel: "抄經：",
+        helpModalTitle: "📘 等觀筆耕 · 使用步驟",
+        helpModalClose: "我知道了",
+        appSubTitle: " 經藏版",
+        titleInPlaceholder: "請輸入經名...",
+        syncInPlaceholder: "在此粘貼需要補錄經典的片段...",
+        previewPlaceholder: "在此粘貼自選經典...",
+        titleConfirmBtnText: "確認",
+        modeBuiltin: "系統經藏",
+        modeCustom: "自選經藏"
+    }
+};
+
+function refreshUIVersionDisplay() {
+    const d = uiVersionDict[currentUIVersion];
+    
+    const deskToggle = document.getElementById("ui-trad-toggle-desktop");
+    const mobToggle = document.getElementById("ui-trad-toggle-mobile");
+    if(deskToggle) deskToggle.textContent = d.switchBtnText;
+    if(mobToggle) mobToggle.textContent = d.switchBtnText;
+    
+    const lblPanelMain = document.getElementById("ui-lbl-panel-main");
+    if(lblPanelMain) lblPanelMain.textContent = d.mainPanelTitle;
+    
+    const optCustomDir = document.getElementById("ui-opt-custom-dir");
+    if(optCustomDir) optCustomDir.textContent = d.customDirOpt;
+    
+    const lblClearPre = document.getElementById("ui-lbl-clear-pre-btn");
+    if(lblClearPre) lblClearPre.textContent = d.clearPreBtn;
+    
+    const btnImportPre = document.getElementById("ui-btn-import-pre");
+    if(btnImportPre) btnImportPre.textContent = d.importPreBtn;
+    
+    const btnManualSave = document.getElementById("ui-btn-manual-save");
+    if(btnManualSave) btnManualSave.textContent = d.manualSaveBtn;
+    
+    const lblPinyinTitle = document.getElementById("ui-lbl-pinyin-title");
+    if(lblPinyinTitle) lblPinyinTitle.textContent = d.pinyinBoxTitle;
+
+    const btnPinyinToggle = document.getElementById("ui-btn-pinyin-toggle");
+    if (btnPinyinToggle) {
+        if (pinyinMode === "zhuyin") {
+            btnPinyinToggle.textContent = (currentUIVersion === "hant") ? "🟠 註音" : "🟠 注音";
+        } else {
+            btnPinyinToggle.textContent = d.pinyinToggleBtn; 
+        }
+    }
+        
+    const btnCheck = document.getElementById("check-btn");
+    if(btnCheck && !isCheckMode) btnCheck.textContent = d.checkBtnNormal;
+    
+    const tipWarn = document.getElementById("error-warning");
+    if(tipWarn) tipWarn.textContent = d.errorWarningTip;
+    
+    const lblPyChar = document.getElementById("py-char");
+    if(lblPyChar && (lblPyChar.textContent === "拼音参考" || lblPyChar.textContent === "拼音參考")) lblPyChar.textContent = d.pinyinCharTip;
+    
+    const lblTitle = document.getElementById("ui-lbl-title");
+    if(lblTitle) lblTitle.textContent = d.sutraTitleLabel;
+    
+    const lblSyncHead = document.getElementById("ui-lbl-sync-head");
+    if(lblSyncHead) lblSyncHead.textContent = d.syncHeadLabel;
+    
+    const btnSyncSubmit = document.getElementById("ui-btn-sync-submit");
+    if(btnSyncSubmit) btnSyncSubmit.textContent = d.syncSubmitBtn;
+    
+    const btnHelpTrigger = document.getElementById("ui-btn-help-trigger");
+    if(btnHelpTrigger) btnHelpTrigger.textContent = d.helpTriggerBtn;
+    
+    const lblCanonTip = document.getElementById("ui-lbl-canon-tip");
+    if(lblCanonTip) lblCanonTip.textContent = d.canonTipText;
+    
+    const lblSysTools = document.getElementById("ui-lbl-sys-tools");
+    if(lblSysTools) lblSysTools.textContent = d.sysToolsHeader;
+    
+    const btnExpTxt = document.getElementById("ui-btn-exp-txt");
+    if(btnExpTxt) btnExpTxt.textContent = d.expTxtBtn;
+    
+    const btnExpBak = document.getElementById("ui-btn-exp-bak");
+    if(btnExpBak) btnExpBak.textContent = d.expBakBtn;
+    
+    const btnImpBak = document.getElementById("ui-btn-imp-bak");
+    if(btnImpBak) btnImpBak.textContent = d.impBakBtn;
+    
+    const btnCleanUi = document.getElementById("ui-btn-clean-ui");
+    if(btnCleanUi) btnCleanUi.textContent = d.cleanUiBtn;
+    
+    const btnClearBase = document.getElementById("ui-btn-clear-base");
+    if(btnClearBase) btnClearBase.textContent = d.clearBaseBtn;
+    
+    const btnClearGold = document.getElementById("ui-btn-clear-gold");
+    if(btnClearGold) btnClearGold.textContent = d.clearGoldBtn;
+    
+    const lblStatBase = document.getElementById("ui-lbl-stat-base");
+    if(lblStatBase) {
+        const bc = document.getElementById("base-count").outerHTML;
+        lblStatBase.innerHTML = d.statBaseLabel + bc;
+    }
+    const lblStatTyped = document.getElementById("ui-lbl-stat-typed");
+    if(lblStatTyped) {
+        const cc = document.getElementById("char-count").outerHTML;
+        lblStatTyped.innerHTML = d.statTypedLabel + cc;
+    }
+    
+    const lblHelpTitle = document.getElementById("ui-lbl-help-title");
+    if(lblHelpTitle) lblHelpTitle.textContent = d.helpModalTitle;
+    
+    const btnHelpClose = document.getElementById("ui-btn-help-close");
+    if(btnHelpClose) btnHelpClose.textContent = d.helpModalClose;
+    
+    const lbl精进Box = document.getElementById("ui-lbl-精进-box");
+    if(lbl精进Box) {
+        const tr = document.getElementById("total-run").outerHTML;
+        lbl精进Box.innerHTML = d.runCountLabelPrefix + tr + d.runCountLabelSuffix;
+    }
+
+    if(titleIn) titleIn.placeholder = d.titleInPlaceholder;
+    const syncIn = document.getElementById("sync-input");
+    if(syncIn) syncIn.placeholder = d.syncInPlaceholder;
+    const previewArea = document.getElementById("sutra-preview");
+    if(previewArea) previewArea.placeholder = d.previewPlaceholder;
+
+    const confirmBtn = document.getElementById("title-confirm-btn");
+    if (confirmBtn) confirmBtn.textContent = d.titleConfirmBtnText;
+
+    const dynamicTitleEl = document.getElementById("dynamic-title");
+    if (dynamicTitleEl) {
+        const titlePrefix = (currentUIVersion === "hans") ? "等观笔耕v<br>" : "等觀筆耕v<br>";
+        dynamicTitleEl.innerHTML = titlePrefix + window.DGBJ_VERSION + d.appSubTitle;
+    }
+
+    const lblHelpModalTitle = document.getElementById("ui-lbl-help-modal-title");
+    if (lblHelpModalTitle) {
+        lblHelpModalTitle.textContent = (currentUIVersion === "hant") ? "📘 等觀筆耕 · 使用步驟" : "📘 等观笔耕 · 使用步骤";
+    }   
+
+    updateModeDisplay();
+}
+
+    function toggleUIVersion(e) {
+        if(e) e.stopPropagation();
+        currentUIVersion = (currentUIVersion === "hans") ? "hant" : "hans";
+        localStorage.setItem("DGBJ_UI_LANG_VERSION", currentUIVersion);
+        refreshUIVersionDisplay();
+    }
+
     function toggleDrawer(id) {
         const el = document.getElementById(id);
         const mask = document.getElementById('drawer-mask');
@@ -842,12 +1080,8 @@
         } catch { return inputLy.innerText.length; }
     }
 
-
-
-// ==================== 🌟 经名确认与档案安全平移控制总线 ====================
 let oldSutraTitle = "";
 
-// 1. 鼠标点进输入框的瞬间，死死记住改名之前的极旧标题，作为底层平移档案的绝对依据
 const titleInputElement = document.getElementById('title-input');
 if (titleInputElement) {
     titleInputElement.addEventListener('focus', () => {
@@ -855,7 +1089,6 @@ if (titleInputElement) {
     });
 }
 
-// 2. 🌟 核心替代函数：只有亲自按下“确认”键，才执行大标题、品名签和数据库的归正搬家
 async function handleTitleConfirm() {
     const newTitle = getCurrentTitle();
     
@@ -864,7 +1097,6 @@ async function handleTitleConfirm() {
         return;
     }
 
-    // 如果在自选模式下，且用户确实把旧名字改成了新名字，触发移魂大法
     if (currentRoom === "custom" && oldSutraTitle && newTitle && oldSutraTitle !== newTitle) {
         try {
             const oldId = oldSutraTitle;
@@ -872,15 +1104,12 @@ async function handleTitleConfirm() {
             const oldRecord = await getRecord(STORE_CUSTOM, oldId);
             
             if (oldRecord) {
-                // 完美承接所有的抄经功德、底稿和金色字进度
                 oldRecord.id = newId;
                 oldRecord.title = newTitle;
                 oldRecord.updatedAt = Date.now();
                 
-                // 将新名字档案安座落库
                 await putRecord(STORE_CUSTOM, oldRecord);
                 
-                // 斩草除根：立刻物理化除掉那个极旧名字的空壳躯壳
                 const transaction = db.transaction([STORE_CUSTOM], "readwrite");
                 transaction.objectStore(STORE_CUSTOM).delete(oldId);
                 
@@ -891,13 +1120,11 @@ async function handleTitleConfirm() {
         }
     }
 
-    // 同步刷新左侧大标题 and 黄色品名签
     updateTitle();
     if (bookmarkDisplay) {
         bookmarkDisplay.innerText = newTitle;
     }
 
-    // 交接新接力棒，并立刻触发一次强制落库保存与菜单刷新
     oldSutraTitle = newTitle;
     await saveNow();
     await refreshSutraSelector();
@@ -905,45 +1132,38 @@ async function handleTitleConfirm() {
     alert(`《${newTitle}》标题已确认归正！✅`);
 }
 
-// 3. 核心保存机制（去除了对旧 handleTitleInput 的依赖）
-function save() { 
-    clearTimeout(saveTimer); 
-    saveTimer = setTimeout(async () => { await saveCurrentSutra(); }, 500); 
-}
-
-async function saveNow() { 
-    clearTimeout(saveTimer); 
-    await saveCurrentSutra(); 
-}
-
-// 4. 自选经典下拉菜单刷新引擎（保持原汁原味的排布与最新排序）
-async function refreshSutraSelector() {
-    const selector = document.getElementById('sutra-selector');
-    if (!selector || !db) return;
-    const currentId = currentRoom === "custom" ? getCurrentId() : "";
-    const records = await getAllRecords(STORE_CUSTOM);
-    records.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
-    selector.innerHTML = `<option value="">--- 自选经典目录 ---</option>`;
-    records.forEach(item => {
-        const opt = document.createElement("option");
-        opt.value = item.id; opt.textContent = item.title;
-        selector.appendChild(opt);
-    });
-    if (currentId && [...selector.options].some(o => o.value === currentId)) { 
-        selector.value = currentId; 
+    function save() { 
+        clearTimeout(saveTimer); 
+        saveTimer = setTimeout(async () => { await saveCurrentSutra(); }, 500); 
     }
-}
 
+    async function saveNow() { 
+        clearTimeout(saveTimer); 
+        await saveCurrentSutra(); 
+    }
 
-
+    async function refreshSutraSelector() {
+        const selector = document.getElementById('sutra-selector');
+        if (!selector || !db) return;
+        const currentId = currentRoom === "custom" ? getCurrentId() : "";
+        const records = await getAllRecords(STORE_CUSTOM);
+        records.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+        selector.innerHTML = `<option id="ui-opt-custom-dir" value="">${uiVersionDict[currentUIVersion].customDirOpt}</option>`;
+        records.forEach(item => {
+            const opt = document.createElement("option");
+            opt.value = item.id; opt.textContent = item.title;
+            selector.appendChild(opt);
+        });
+        if (currentId && [...selector.options].some(o => o.value === currentId)) { 
+            selector.value = currentId; 
+        }
+    }
 
     function setLockedView() {
         sourceIn.readOnly = true;
         const panel = document.getElementById('sync-panel');
         if (panel) panel.style.display = 'flex';
     }
-
-
 
    async function loadSutraById(id) {
         currentRoom = "custom"; currentSutraKey = ""; updateModeDisplay();
@@ -958,7 +1178,6 @@ async function refreshSutraSelector() {
         if (sourceIn.value) setLockedView();
         updateCount();
 
-        // 🌟【核心修复补丁】在数据完全加载、视图更新完毕后，强行把确认键全面唤醒，恢复饱满颜色与点击光标
         const confirmBtn = document.getElementById('title-confirm-btn');
         if (confirmBtn) {
             confirmBtn.disabled = false;
@@ -971,8 +1190,6 @@ async function refreshSutraSelector() {
         if (selector) { selector.value = id; }
         setTimeout(goGoldEnd, 300);
     }
-
-
 
     async function previewSutra() {
         const selector = document.getElementById('sutra-selector');
@@ -1015,11 +1232,9 @@ async function refreshSutraSelector() {
         titleDisp.innerText = "深入经藏 智慧如海";
     }
 
-
 function updateModeDisplay() {
         const clearBtn = document.querySelector('button[onclick="clearBase()"]');
         const titleInput = document.getElementById("title-input");
-        // 🌟 新增：精准抓取经名确认按钮
         const confirmBtn = document.getElementById('title-confirm-btn');
 
         if (currentRoom === "builtin") {
@@ -1034,7 +1249,6 @@ function updateModeDisplay() {
                 clearBtn.style.opacity = "0.4";
                 clearBtn.style.cursor = "not-allowed";
             }
-            // 🌟 新增：系统经典状态下，强制将确认键打入冷宫，同步熄灭
             if (confirmBtn) {
                 confirmBtn.disabled = true;
                 confirmBtn.style.opacity = "0.4";
@@ -1052,7 +1266,6 @@ function updateModeDisplay() {
                 clearBtn.style.opacity = "1";
                 clearBtn.style.cursor = "pointer";
             }
-            // 🌟 新增：自选经典状态下，重新全面唤醒确认键，恢复饱满原色与点击光标
             if (confirmBtn) {
                 confirmBtn.disabled = false;
                 confirmBtn.style.opacity = "1";
@@ -1061,22 +1274,24 @@ function updateModeDisplay() {
         }
 
         const el = document.getElementById("current-mode");
-        if (!el) return;
+    if (!el) return;
 
-        if (currentRoom === "builtin") {
-            el.innerText = "当前模式：📚 系统经藏";
-            el.style.background = "rgba(45,111,123,0.08)";
-            el.style.color = "var(--primary)";
-        } else {
-            el.innerText = "当前模式：🪶 自选经藏";
-            el.style.background = "rgba(184,134,11,0.10)";
-            el.style.color = "#9a6b00";
-        }
+    const d = uiVersionDict[currentUIVersion];
+    const modePrefix = d.currentModeLabel || ((currentUIVersion === "hans") ? "当前模式：" : "當前模式：");
+
+    if (currentRoom === "builtin") {
+        el.innerText = modePrefix + "📚 " + d.modeBuiltin;
+        el.style.background = "rgba(45,111,123,0.08)";
+        el.style.color = "var(--primary)";
+    } else {
+        el.innerText = modePrefix + "🪶 " + d.modeCustom;
+        el.style.background = "rgba(184,134,11,0.10)";
+        el.style.color = "#9a6b00";
+    }
 }
 
-
     function isGenericOpeningLine(line) {
-        const clean = line.replace(/[\s　《》〈〉「」『』（）()：:，,。.!！?？、]/g, "");
+        const clean = line.replace(/[\s 《》〈〉「」『』（）()：:，,。.!！?？、]/g, "");
         return ["南无本师释迦牟尼佛","南無本師釋迦牟尼佛","开经偈","開經偈","无上甚深微妙法","無上甚深微妙法"].some(text => clean.includes(text));
     }
 
@@ -1089,7 +1304,7 @@ function updateModeDisplay() {
             const canonMatch = line.match(canonPattern);
             if (canonMatch && canonMatch[1]) return canonMatch[1].replace(/[《》〈〉「」『』]/g, "").trim();
             if (/^No\.\s*\d+/i.test(line) || /[，,、。.!！?？；;]/.test(line)) continue;
-            const clean = line.replace(/[《》〈〉「」『』（）()：:\s　]/g, "");
+            const clean = line.replace(/[《》〈〉「」『』（）()：:\s ]/g, "");
             if (clean) return clean;
         }
         return "";
@@ -1138,7 +1353,6 @@ function updateModeDisplay() {
         save(); 
     }
 
-    // 英文中的 1000 保持 1,000 写法，此功能此处不涉及变动
     function lockSource() { 
         if (!sourceIn.value.trim()) return; 
         baseLy.innerText = cleanTextForMobile(sourceIn.value);
@@ -1172,7 +1386,7 @@ function updateModeDisplay() {
                     if (remainingChars > 0) {
                         alert(`✨ 接近满愿！检测到剩余未抄字数已小于130字（当前剩余 ${remainingChars} 字），系统已提前为您记录入藏 1 遍。您可直接点击【再抄一遍】清净重书。`);
                     } else {
-                        alert("✨ 功德圆满！本经已完整抄毕一遍，遍数已为您自动记录入藏。"); 
+                        alert("✨ 功功德圆满！本经已完整抄毕一遍，遍数已为您自动记录入藏。"); 
                     }
                 }, 100);
             }
@@ -1193,12 +1407,12 @@ function updateModeDisplay() {
         isCheckMode = !isCheckMode;
         
         if (isCheckMode) {
-            btn.innerText = "🔍 校验中..."; 
+            btn.innerText = uiVersionDict[currentUIVersion].checkBtnActive; 
             btn.style.background = "#2d6f7b";
             
             const errData = findFirstErrorIndex();
             if (errData.index >= 0) {
-                btn.innerText = "⚠️ 录入有误"; 
+                btn.innerText = uiVersionDict[currentUIVersion].checkBtnError; 
                 btn.style.background = "#e74c3c"; 
                 if (warn) warn.style.display = 'block';
                 
@@ -1213,7 +1427,7 @@ function updateModeDisplay() {
             } else {
                 alert("当前录入完全正确！"); 
                 isCheckMode = false; 
-                btn.innerText = "🔍 开启校验"; 
+                btn.innerText = uiVersionDict[currentUIVersion].checkBtnNormal; 
                 btn.style.background = "var(--primary)";
             }
         } else {
@@ -1252,7 +1466,7 @@ function updateModeDisplay() {
         isCheckMode = false;
         const btn = document.getElementById('check-btn'); 
         const warn = document.getElementById('error-warning');
-        if (btn) { btn.innerText = "🔍 开启校验"; btn.style.background = "var(--primary)"; }
+        if (btn) { btn.innerText = uiVersionDict[currentUIVersion].checkBtnNormal; btn.style.background = "var(--primary)"; }
         if (warn) warn.style.display = 'none';
 
         updateCount(); 
@@ -1273,7 +1487,7 @@ function updateModeDisplay() {
 
         const btn = document.getElementById('check-btn');
         if (btn) {
-            btn.innerText = "🔍 开启校验";
+            btn.innerText = uiVersionDict[currentUIVersion].checkBtnNormal;
             btn.style.background = "var(--primary)";
         }
         goGoldEnd();
@@ -1412,8 +1626,6 @@ function updateModeDisplay() {
         }
     }
 
-    
-
 function showErrorBubble(x, y, currentIndex, totalErrors) {
         const oldBubble = document.getElementById("error-bubble");
         if (oldBubble) oldBubble.remove();
@@ -1423,35 +1635,32 @@ function showErrorBubble(x, y, currentIndex, totalErrors) {
             totalErrors = reScan.total;
         }
 
-        // 🌟 核心逻辑：提取当前错字与底稿中对应的正确字
         const baseChars = toChars(sourceIn.value || baseLy.innerText || "");
         const typedChars = toChars(inputLy.innerText || "");
-        const wrongChar = typedChars[currentIndex] || "?";  // 金色错字
-        const rightChar = baseChars[currentIndex] || "?";  // 底稿正确字
+        const wrongChar = typedChars[currentIndex] || "?";  
+        const rightChar = baseChars[currentIndex] || "?";  
 
         const extraCount = totalErrors - 1;
         let extraNotice = "";
         let buttonHtml = "";
 
-        // 🌟 提取出通用的“一键自动修正”按钮 HTML 与样式
         const autoFixBtnHtml = `
             <button onclick="event.stopPropagation(); if (confirm('检测到录入与底本有差异，是否由系统一键自动修正错字笔误？')) { autoFixText(); }" 
-                    style="background: #2e8b57; color: white; border: none; padding: 4px 10px; font-size: 11px; border-radius: 6px; cursor: pointer; font-weight: bold; box-shadow: 0 1px 4px rgba(0,0,0,0.15); font-family: sans-serif; transition: 0.2s;">
+                    style="background: #2e8b57; color: white; border: none; padding: 4px 10px; font-size: 11px; border-radius: 6px; cursor: pointer; font-weight: normal; box-shadow: 0 1px 4px rgba(0,0,0,0.15); font-family: sans-serif; transition: 0.2s;">
                 ✨ 一键修正
             </button>
         `;
 
         const closeBtnHtml = `
             <button onclick="event.stopPropagation(); const ob = document.getElementById('error-bubble'); if(ob)ob.remove(); removeHighlights(); goGoldEnd();" 
-                    style="background: #f5f5f5; color: #666; border: 1px solid #ddd; padding: 4px 10px; font-size: 11px; border-radius: 6px; cursor: pointer; font-weight: bold; font-family: sans-serif; transition: 0.2s;">
+                    style="background: #f5f5f5; color: #666; border: 1px solid #ddd; padding: 4px 10px; font-size: 11px; border-radius: 6px; cursor: pointer; font-weight: normal; font-family: sans-serif; transition: 0.2s;">
                 知道了
             </button>
         `;
 
-        // 🌟 根据错字数量，动态拼装按钮布局
         if (totalErrors > 1) {
             extraNotice = `<div style="font-size:12px; font-weight:normal; color:#e74c3c; margin-top:5px; text-align:center;">
-                💡 除此处外，还有 <b style="color:#e74c3c;">${extraCount}</b> 处错字。
+                💡 除此处外，还有 <b style="color:#e74c3c; font-weight:normal;">${extraCount}</b> 处错字。
             </div>`;
             buttonHtml = `
                 <div style="margin-top: 8px; display: flex; justify-content: space-between; align-items: center; gap: 6px;">
@@ -1459,7 +1668,7 @@ function showErrorBubble(x, y, currentIndex, totalErrors) {
                     <div style="display: flex; gap: 6px;">
                         ${autoFixBtnHtml}
                         <button onclick="event.stopPropagation(); navigateToNextError(${currentIndex});" 
-                                style="background: var(--primary); color: white; border: none; padding: 4px 10px; font-size: 11px; border-radius: 6px; cursor: pointer; font-weight: bold; box-shadow: 0 1px 4px rgba(0,0,0,0.15); font-family: sans-serif;">
+                                style="background: var(--primary); color: white; border: none; padding: 4px 10px; font-size: 11px; border-radius: 6px; cursor: pointer; font-weight: normal; box-shadow: 0 1px 4px rgba(0,0,0,0.15); font-family: sans-serif;">
                             下一处 ❯
                         </button>
                     </div>
@@ -1477,7 +1686,7 @@ function showErrorBubble(x, y, currentIndex, totalErrors) {
         bubble.id = "error-bubble";
         
         bubble.innerHTML = `
-            <div style="font-size:14px; margin-bottom:5px; color:#b8860b; font-family:'STKaiti', 'KaiTi', serif; text-align:center; font-weight:bold;">
+            <div style="font-size:14px; margin-bottom:5px; color:#b8860b; font-family:'STKaiti', 'KaiTi', serif; text-align:center; font-weight:normal;">
                 📜 字形提示：${wrongChar} → <span style="color:#e74c3c; font-size:16px;">${rightChar}</span>
             </div>
             <div style="font-size:12px; font-weight:normal; color:#666; line-height:1.4; max-width:250px; text-align:left; font-family:sans-serif;">
@@ -1492,7 +1701,7 @@ function showErrorBubble(x, y, currentIndex, totalErrors) {
         bubble.style.border = "2px solid var(--gold)";
         bubble.style.borderRadius = "14px";
         bubble.style.padding = "10px 14px";
-        bubble.style.fontWeight = "bold";
+        bubble.style.fontWeight = "normal";
         bubble.style.boxShadow = "0 4px 18px rgba(0,0,0,0.15)";
         bubble.style.zIndex = "99999";
         bubble.style.pointerEvents = "auto"; 
@@ -1522,9 +1731,6 @@ function showErrorBubble(x, y, currentIndex, totalErrors) {
             if (bubble.parentNode) bubble.remove();
         }, hideDuration);
     }
-
-
-
 
     function navigateToNextError(currentIdx) {
         const baseChars = toChars(sourceIn.value || baseLy.innerText || "");
@@ -1632,10 +1838,15 @@ function showErrorBubble(x, y, currentIndex, totalErrors) {
         const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `${title}_抄经.txt`; a.click();
     }
 
-    function togglePinyinMode(e) {
-        pinyinMode = (pinyinMode === "han") ? "zhuyin" : "han";
-        e.currentTarget.innerText = (pinyinMode === "zhuyin") ? "🟠 注音" : "🔤 拼音";
+function togglePinyinMode(e) {
+    pinyinMode = (pinyinMode === "han") ? "zhuyin" : "han";
+    
+    if (pinyinMode === "zhuyin") {
+        e.currentTarget.textContent = (currentUIVersion === "hant") ? "🟠 註音" : "🟠 注音";
+    } else {
+        e.currentTarget.textContent = uiVersionDict[currentUIVersion].pinyinToggleBtn;
     }
+}
 
     const ZHUYIN_INITIAL_MAP = { b:"ㄅ",p:"ㄆ",m:"ㄇ",f:"ㄈ",d:"ㄉ",t:"ㄊ",n:"ㄋ",l:"ㄌ",g:"ㄍ",k:"ㄎ",h:"ㄏ",j:"ㄐ",q:"ㄑ",x:"ㄒ",zh:"ㄓ",ch:"ㄔ",sh:"ㄕ",r:"ㄖ",z:"ㄗ",c:"ㄘ",s:"ㄙ" };
     const ZHUYIN_FINAL_MAP = { a:"ㄚ",o:"ㄛ",e:"ㄜ",ai:"ㄞ",ei:"ㄟ",ao:"ㄠ",ou:"ㄡ",an:"ㄢ",en:"ㄣ",ang:"ㄤ",eng:"ㄥ",er:"ㄦ",i:"ㄧ",ia:"ㄧㄚ",ie:"ㄧㄝ",iao:"ㄧㄠ",iu:"ㄧㄡ",ian:"ㄧㄢ",in:"ㄧㄣ",iang:"ㄧㄤ",ing:"ㄧㄥ",iong:"ㄩㄥ",u:"ㄨ",ua:"ㄨㄚ",uo:"ㄨㄛ",uai:"ㄨㄞ",ui:"ㄨㄟ",uan:"ㄨㄢ",un:"ㄨㄣ",uang:"ㄨㄤ",ong:"ㄨㄥ",v:"ㄩ",ve:"ㄩㄝ",van:"ㄩㄢ",vn:"ㄩㄣ","ü":"ㄩ","üe":"ㄩㄝ","üan":"ㄩㄢ","ün":"ㄩㄣ" };
@@ -1651,9 +1862,6 @@ function showErrorBubble(x, y, currentIndex, totalErrors) {
         return (ZHUYIN_INITIAL_MAP[initial] || "") + (ZHUYIN_FINAL_MAP[final] || final);
     }
 
-
-
-    // 🌟 彻底重塑物理化除底稿函数
 async function clearBase() {
     if (currentRoom === "builtin") { alert("系统内置经典不能物理化除。"); return; }
     const title = getCurrentTitle(); const id = getCurrentId(); const storeName = getCurrentStore();
@@ -1669,13 +1877,11 @@ async function clearBase() {
             transaction.objectStore(STORE_META).delete(getActiveMetaKey());
             
             transaction.oncomplete = async () => {
-                // 物理化除的同时，强行把屏幕上的精进遍数重置归零
                 const runEl = document.getElementById('total-run');
                 if (runEl) {
                     runEl.innerText = "0";
                 }
 
-                // 强行把左侧竖排品名签栏洗净，回归初始状态
                 if (bookmarkDisplay) {
                     bookmarkDisplay.innerText = "(品名)";
                 }
@@ -1699,8 +1905,6 @@ async function clearBase() {
         } catch (e) { alert("化除失败"); }
     }
 }
-
-
 
     async function clearGold() {
         const typedText = inputLy.innerText.replace(/\u200B/g, "");
@@ -1778,8 +1982,6 @@ async function clearBase() {
         const saved = await getRecord(STORE_BUILTIN, key);
         
         if (saved) {
-
-        // 标题永远采用最新经文定义
          titleIn.value = item.title;
          sourceIn.value = item.content;
 
@@ -1861,7 +2063,7 @@ async function clearBase() {
     }
 
     let helpTraditional = false;
-    const helpTradMap = { "经":"經","观":"觀","经典":"經典","經藏":"经藏","选择":"選擇","实现":"實現","点击":"點擊","按钮":"按鈕","摄":"幫","取":"取","内容":"內容","底稿":"底稿","生成":"生成","银":"銀","开始":"開始","层":"層","自动":"自動","保存":"保存","检":"檢","查":"查","正误":"正誤","累计":"累計","恢复":"恢復","打开":"打開","网址":"網址","分享":"分享","添加":"添加","出现":"出現","图标":"圖標","菜单":"菜單","更多":"更多","找到":"找到","桌面":"桌面","快捷":"快捷","确定":"確認","帮助":"幫助","解决":"解決","手机":"手機","步骤":"步驟","继续":"繼續","边":"邊","贴":"貼","右侧":"右側","自选":"自選","中间":"中間","将":"將","侧":"側","写":"寫","间":"間","选":"選","帮":"幫","关":"關","于":"於","随":"隨","时":"時","问":"問","后":"後","并":"並","会":"會","现":"現","栏目":"栏目","担心":"擔心","这样":"這樣","灵活":"靈活","熟识":"熟識","分成系统":"分成系統","两个系统":"兩個系統","系统的":"系統等","设置":"設置","错":"錯","为了让":"為了讓","并点击":"並點擊","屏":"螢","屏幕":"螢幕","拼音示例":"拼音範例","标准音":"標準音","咒语发音参考":"咒語發音參考","输入错别字代替某疑难字":"輸入错字代替某疑難字","然后按此按钮即可":"然後按此按鈕即可" };
+    const helpTradMap = { "经":"經","观":"觀","经典":"經典","經藏":"经藏","选择":"選擇","实现":"實現","点击":"點擊","按钮":"按鈕","摄":"幫","取":"取","内容":"內容","底稿":"底稿","生成":"生成","银":"銀","开始":"開始","层":"層","自动":"自動","保存":"保存","检":"檢","查":"查","正误":"正誤","累计":"累計","恢复":"恢復","打开":"打開","网址":"網址","分享":"分享","添加":"添加","出现":"出現","图标":"圖標","菜单":"菜單","更多":"更多","找到":"找到","桌面":"桌面","快捷":"快捷","确定":"確認","帮助":"幫助","解决":"解決","手机":"手機","步骤":"步驟","继续":"繼續","边":"邊","贴":"貼","右侧":"右側","自选":"自選","中间":"中間","将":"將","侧":"側","写":"寫","间":"間","选":"選","帮":"幫","关":"關","于":"於","随":"隨","时":"時","问":"問","后":"後","并":"並","会":"會","现":"現","栏目":"栏目","担心":"擔心","这样":"這樣","灵活":"靈活","熟识":"熟識","分成系统":"分成系統","两个系统":"兩個系統","系统的":"系統等","设置":"設置","错":"錯","为了让":"為了讓","并点击":"並點擊","屏":"螢","屏幕":"螢幕","拼音示例":"拼音範例","标准音":"標準音","咒语发音参考":"咒語發音參考","输入错别字代替某疑难字":"輸入错字代替某疑難字","然后按此按钮即可":"然後按此按鈕即可","回车换行":"回車換行" };
 
     function helpToTrad(text){
         Object.keys(helpTradMap).forEach(k=>{ text = text.split(k).join(helpTradMap[k]); });
@@ -1871,75 +2073,33 @@ async function clearBase() {
     document.getElementById("help-trad-toggle").onclick = function(){
         helpTraditional = !helpTraditional;
         this.innerText = helpTraditional ? "繁體" : "简体";
+        
+        const modalTitle = document.getElementById("ui-lbl-help-modal-title");
+        if (modalTitle) {
+            modalTitle.textContent = helpTraditional ? "📘 等觀筆耕 · 使用步驟" : "📘 等观笔耕 · 使用步骤";
+        }
+
         const box = document.getElementById("help-content"); if(!box) return;
         if(helpTraditional){ box.dataset.origin = box.innerHTML; box.innerHTML = helpToTrad(box.innerHTML); }
         else { box.innerHTML = box.dataset.origin; }
     };
 
     window.onload = async () => {
+        refreshUIVersionDisplay();
         renderMenu();
-        const sysSelect = document.getElementById("sutra-select");
-        if (sysSelect) {
-            sysSelect.addEventListener("change", async function () {
-                if (this.value === "RESET_INTERFACE") {
-                    sourceIn.value = ""; baseLy.innerText = ""; inputLy.innerHTML = "";
-                    if (titleIn) titleIn.value = "";
-                    if (bookmarkDisplay) bookmarkDisplay.innerText = "(品名)";
-                    updateTitle(); sourceIn.readOnly = false;
-                    const panel = document.getElementById('sync-panel'); if (panel) panel.style.display = 'none';
-                    isCurrentRunCounted = false;
-                    updateCount(); closeAllDrawers();
-                } else if (this.value) {
-                    await loadSutra(this.value);
-                    setTimeout(() => { closeAllDrawers(); }, 100);
-                }
-            });
-        }
-
-
-       const selector = document.getElementById("sutra-selector");
-        if (selector) {
-            selector.addEventListener("change", async function () {
-                if (!this.value) {
-                    currentRoom = "custom"; currentSutraKey = "";
-                    sourceIn.value = ""; baseLy.innerText = ""; inputLy.innerHTML = ""; titleIn.value = "";
-                    bookmarkDisplay.innerText = "(品名)"; document.getElementById("total-run").innerText = "0";
-                    sourceIn.readOnly = false; titleIn.readOnly = false;
-                    
-                    const confirmBtn = document.getElementById('title-confirm-btn');
-                    if (confirmBtn) {
-                        confirmBtn.disabled = false;
-                        confirmBtn.style.opacity = "1";
-                        confirmBtn.style.cursor = "pointer";
-                    }
-
-                    const panel = document.getElementById("sync-panel"); if (panel) panel.style.display = "none";
-                    isCurrentRunCounted = false;
-                    updateTitle(); updateCount(); updateModeDisplay();
-                    setTimeout(() => { closeAllDrawers(); }, 100); return;
-                }
-                await loadSutraById(this.value);
-                setTimeout(() => { closeAllDrawers(); }, 100);
-            });
-        }
-
-
-
-        if (sourceIn) {
-            sourceIn.addEventListener("paste", function (e) {
-                if (inputLy && inputLy.textContent.trim().length > 0) {
-                    if (!confirm("⚠️ 即将替换当前底稿与抄经进度，是否继续？")) e.preventDefault();
-                }
-            });
-        }
 
         db = await openDB();
         startDBHeartbeat();
         await refreshSutraSelector();
 
+        const sysSelect = document.getElementById("sutra-select");
+        const selector = document.getElementById("sutra-selector");
+
         const activeRoom = await getMeta("activeRoom");
         const activeBuiltinId = await getMeta("activeBuiltinId");
         const activeCustomId = await getMeta("activeCustomId");
+
+        console.log("🚀 笔耕开屏安全检测：正在唤醒历史断点...", { activeRoom, activeBuiltinId, activeCustomId });
 
         if (activeRoom === "builtin" && activeBuiltinId && sysSelect) {
             sysSelect.value = activeBuiltinId;
@@ -1982,6 +2142,58 @@ async function clearBase() {
             }, 50);
         });
 
+        if (sysSelect) {
+            sysSelect.addEventListener("change", async function () {
+                if (window.clearBaseSearchHighlights) window.clearBaseSearchHighlights();
+                if (this.value === "RESET_INTERFACE") {
+                    sourceIn.value = ""; baseLy.innerText = ""; inputLy.innerHTML = "";
+                    if (titleIn) titleIn.value = "";
+                    if (bookmarkDisplay) bookmarkDisplay.innerText = "(品名)";
+                    updateTitle(); sourceIn.readOnly = false;
+                    const panel = document.getElementById('sync-panel'); if (panel) panel.style.display = 'none';
+                    isCurrentRunCounted = false;
+                    updateCount(); closeAllDrawers();
+                } else if (this.value) {
+                    await loadSutra(this.value);
+                    setTimeout(() => { closeAllDrawers(); }, 100);
+                }
+            });
+        }
+
+        if (selector) {
+            selector.addEventListener("change", async function () {
+                if (window.clearBaseSearchHighlights) window.clearBaseSearchHighlights();
+                if (!this.value) {
+                    currentRoom = "custom"; currentSutraKey = "";
+                    sourceIn.value = ""; baseLy.innerText = ""; inputLy.innerHTML = ""; titleIn.value = "";
+                    bookmarkDisplay.innerText = "(品名)"; document.getElementById("total-run").innerText = "0";
+                    sourceIn.readOnly = false; titleIn.readOnly = false;
+                    
+                    const confirmBtn = document.getElementById('title-confirm-btn');
+                    if (confirmBtn) {
+                        confirmBtn.disabled = false;
+                        confirmBtn.style.opacity = "1";
+                        confirmBtn.style.cursor = "pointer";
+                    }
+
+                    const panel = document.getElementById("sync-panel"); if (panel) panel.style.display = "none";
+                    isCurrentRunCounted = false;
+                    updateTitle(); updateCount(); updateModeDisplay();
+                    setTimeout(() => { closeAllDrawers(); }, 100); return;
+                }
+                await loadSutraById(this.value);
+                setTimeout(() => { closeAllDrawers(); }, 100);
+            });
+        }
+
+        if (sourceIn) {
+            sourceIn.addEventListener("paste", function (e) {
+                if (inputLy && inputLy.textContent.trim().length > 0) {
+                    if (!confirm("⚠️ 即将替换当前底稿与抄经进度，是否继续？")) e.preventDefault();
+                }
+            });
+        }
+
         setInterval(() => { saveNow(); }, 10 * 60 * 1000);
         startTypoWatcher();
     };
@@ -2022,6 +2234,7 @@ async function clearBase() {
 
     function resetInterface() {
         if (confirm("仅清空当前屏幕显示，不删除数据库记录。确定吗？")) {
+            if(window.clearBaseSearchHighlights) window.clearBaseSearchHighlights();
             sourceIn.value = ""; baseLy.innerText = ""; inputLy.innerHTML = ""; titleIn.value = "";
             updateTitle(); sourceIn.readOnly = false;
             const panel = document.getElementById('sync-panel'); if (panel) panel.style.display = 'none';
@@ -2056,6 +2269,129 @@ async function clearBase() {
     inputLy.addEventListener('compositionend', () => { isComposingText = false; setTimeout(updateCount, 0); save(); });
     inputLy.addEventListener('input', () => { if (!isComposingText) { updateCount(); save(); } });
 
+    let baseSearchResults = [];     
+    let currentBaseSearchIdx = -1;  
+    let originalBaseHtmlBackup = ""; 
+
+    window.searchInCurrentSutraData = function() {
+        const keywordInput = document.getElementById('sutra-search-input');
+        const msgContainer = document.getElementById('sutra-search-msg');
+        const baseLayer = document.getElementById('base-layer');
+        
+        if (!keywordInput || !msgContainer || !baseLayer) return;
+        
+        const keyword = keywordInput.value.trim();
+        msgContainer.innerHTML = '';
+
+        if (!originalBaseHtmlBackup && baseLayer.innerHTML && !baseLayer.innerHTML.includes('class="base-search-highlight"')) {
+            originalBaseHtmlBackup = baseLayer.innerHTML;
+        }
+
+        if (originalBaseHtmlBackup) {
+            baseLayer.innerHTML = originalBaseHtmlBackup;
+        }
+
+        if (!keyword) {
+            document.getElementById('search-position-info').innerText = '';
+            return;
+        }
+
+        const rawText = baseLayer.textContent || "";
+        if (!rawText.trim()) {
+            return;
+        }
+
+        if (!rawText.includes(keyword)) {
+            document.getElementById('search-position-info').innerText = '未找到字句';
+            return;
+        }
+
+        let matchCount = 0;
+        const escapedKeyword = keyword.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+        const regex = new RegExp(escapedKeyword, 'g');
+        
+        baseLayer.innerHTML = baseLayer.innerHTML.replace(regex, (match) => {
+            const spanHtml = `<mark id="base-search-match-${matchCount}" class="base-search-highlight" style="background-color: rgba(255, 234, 0, 0.45); color: #222 !important; box-shadow: 0 0 6px #ffea00; border-radius: 3px; padding: 0 2px; transition: all 0.2s; display: inline;">${match}</mark>`;
+            matchCount++;
+            return spanHtml;
+        });
+
+        baseSearchResults = [];
+        for (let i = 0; i < matchCount; i++) {
+            const el = document.getElementById(`base-search-match-${i}`);
+            if (el) baseSearchResults.push(el);
+        }
+
+        currentBaseSearchIdx = 0;
+        const infoEl = document.getElementById('search-position-info');
+        if (infoEl) infoEl.innerText = `(共${baseSearchResults.length}次) 1/${baseSearchResults.length}`;
+
+        msgContainer.innerHTML = `
+            <div style="display: flex; gap: 4px; align-items: center; justify-content: flex-start; margin-top: 3px;">
+                <button onclick="event.stopPropagation(); prevSearchResult();" style="background:var(--primary); color:white; border:none; padding:2px 6px; border-radius:4px; cursor:pointer; font-size:11px; font-weight:normal; height:20px; line-height:20px; box-sizing:border-box;">⬅ 上一处</button>
+                <button onclick="event.stopPropagation(); nextSearchResult();" style="background:var(--primary); color:white; border:none; padding:2px 6px; border-radius:4px; cursor:pointer; font-size:11px; font-weight:normal; height:20px; line-height:20px; box-sizing:border-box;">➡ 下一处</button>
+            </div>
+        `;
+
+        jumpToBaseSearchResult(0);
+    }
+
+    function jumpToBaseSearchResult(index) {
+        if (index < 0 || index >= baseSearchResults.length) return;
+
+        if (currentBaseSearchIdx >= 0 && baseSearchResults[currentBaseSearchIdx]) {
+            baseSearchResults[currentBaseSearchIdx].style.backgroundColor = "rgba(255, 234, 0, 0.45)";
+            baseSearchResults[currentBaseSearchIdx].style.color = "#222";
+        }
+
+        const targetEl = baseSearchResults[index];
+        targetEl.style.backgroundColor = "#d38934";
+        targetEl.style.color = "#ffffff";
+        
+        targetEl.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+            inline: "nearest"
+        });
+
+        currentBaseSearchIdx = index;
+        const info = document.getElementById('search-position-info');
+        if (info) {
+            info.innerText = `(共${baseSearchResults.length}次) ${index + 1}/${baseSearchResults.length}`;
+        }
+    }
+
+    window.nextSearchResult = function() {
+        if (baseSearchResults.length === 0) return;
+        let nextIdx = currentBaseSearchIdx + 1;
+        if (nextIdx >= baseSearchResults.length) nextIdx = 0;
+        jumpToBaseSearchResult(nextIdx);
+    }
+
+    window.prevSearchResult = function() {
+        if (baseSearchResults.length === 0) return;
+        let prevIdx = currentBaseSearchIdx - 1;
+        if (prevIdx < 0) prevIdx = baseSearchResults.length - 1;
+        jumpToBaseSearchResult(prevIdx);
+    }
+
+    window.clearBaseSearchHighlights = function() {
+        const baseLayer = document.getElementById('base-layer');
+        if (baseLayer && originalBaseHtmlBackup) {
+            baseLayer.innerHTML = originalBaseHtmlBackup;
+        }
+        baseSearchResults = [];
+        currentBaseSearchIdx = -1;
+        originalBaseHtmlBackup = ""; 
+        
+        const inputEl = document.getElementById('sutra-search-input');
+        const msgEl = document.getElementById('sutra-search-msg');
+        const infoEl = document.getElementById('search-position-info');
+        if (inputEl) inputEl.value = '';
+        if (msgEl) msgEl.innerHTML = '';
+        if (infoEl) infoEl.innerText = '';
+    }
+
     function getPinyinText(text) {
         if (Array.from(text).length !== 1) return pinyinPro.pinyin(text, { toneType: "none" });
         if (window.SpecialPinyin?.get?.(text)) return window.SpecialPinyin.get(text).display;
@@ -2078,7 +2414,6 @@ async function clearBase() {
     </script>
 
     <script>
-        // 动态读取最顶部的 window.DGBJ_VERSION 变量，开屏瞬间无感印刷，让样式完美闭环
        document.getElementById("dynamic-title").innerText ="等观笔耕v" + window.DGBJ_VERSION + " 经藏版";
     </script>
 
@@ -2089,7 +2424,6 @@ async function clearBase() {
     <script src="./sutras/fhj-t.js"></script>
     <script src="./sutras/bwj-s.js"></script>
     <script src="./sutras/bwj-t.js"></script>
-    <script src="./sutras/test-1.js"></script>
     <script src="./sutras/jgj-s.js"></script>
     <script src="./sutras/jgj-t.js"></script>
     <script src="./sutras/dzj-s.js"></script>
@@ -2159,6 +2493,21 @@ async function clearBase() {
     <script src="./sutras/lqj-s.js"></script>
     <script src="./sutras/lqj-t.js"></script>
 
+<script src="./sutras/prajna/vol001_100.js"></script>
+<script src="./sutras/prajna/vol101_200.js"></script>
+<script src="./sutras/prajna/vol201_300.js"></script>
+<script src="./sutras/prajna/vol301_400.js"></script>
+<script src="./sutras/prajna/vol401_500.js"></script>
+<script src="./sutras/prajna/vol501_600.js"></script>
+
+<script src="./sutras/prajna/vol001_100_t.js"></script>
+<script src="./sutras/prajna/vol101_200_t.js"></script>
+<script src="./sutras/prajna/vol201_300_t.js"></script>
+<script src="./sutras/prajna/vol301_400_t.js"></script>
+<script src="./sutras/prajna/vol401_500_t.js"></script>
+<script src="./sutras/prajna/vol501_600_t.js"></script>
+
+<script src="./sutras/prajna/index.js"></script>
 
 </body>
 </html>
